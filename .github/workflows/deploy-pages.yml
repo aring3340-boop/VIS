@@ -1,0 +1,43 @@
+name: Deploy static site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Require Supabase configuration
+        run: |
+          if grep -Eq 'PASTE_YOUR_(PROJECT_REF|SUPABASE_ANON_KEY)' js/supabase-config.js; then
+            echo "::error::Configure js/supabase-config.js with your Supabase project URL and anon/public key before publishing."
+            exit 1
+          fi
+      - name: Prepare website files
+        run: |
+          mkdir -p _site/css _site/js _site/assets
+          cp ./*.html ./manifest.webmanifest ./sw.js _site/
+          cp ./css/* _site/css/
+          cp ./js/* _site/js/
+          cp ./assets/* _site/assets/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

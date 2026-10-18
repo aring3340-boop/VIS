@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Portal · VIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="dash-hero teacher-hero">
+  <div class="container">
+    <span class="avatar teacher-avatar" aria-hidden="true">👩‍🏫</span>
+    <div class="teacher-greeting">
+      <p><span data-i18n="welcome"></span>, <b id="teacher-name"></b></p>
+      <p class="teacher-username">@<span id="teacher-username"></span> · <span data-i18n="teacher"></span></p>
+    </div>
+    <a class="btn btn-outline btn-sm" href="index.html" data-i18n="view_site"></a>
+    <div class="lang-switch" id="lang-switch"></div>
+    <button class="lang-btn theme-toggle teacher-theme" title="Theme">🌙</button>
+    <button class="btn btn-outline btn-sm" id="btn-logout" data-i18n="logout"></button>
+  </div>
+</div>
+
+<main class="container dash-grid teacher-dashboard">
+  <div class="card teacher-stat">
+    <span class="teacher-stat-icon">🎓</span>
+    <b id="teacher-student-count">0</b>
+    <span data-i18n="teacher_students_count"></span>
+  </div>
+  <div class="card teacher-stat">
+    <span class="teacher-stat-icon">📝</span>
+    <b id="teacher-assignment-count">0</b>
+    <span data-i18n="assignments"></span>
+  </div>
+  <div class="card teacher-stat">
+    <span class="teacher-stat-icon">📚</span>
+    <b id="teacher-material-count">0</b>
+    <span data-i18n="materials"></span>
+  </div>
+  <div class="card teacher-stat">
+    <span class="teacher-stat-icon">🗓️</span>
+    <b id="teacher-class-count">0</b>
+    <span data-i18n="teacher_upcoming_count"></span>
+  </div>
+
+  <section class="card col-4">
+    <h3 data-i18n="teacher_profile"></h3>
+    <div class="grade-bar"><span class="muted" data-i18n="teacher_role"></span><b data-i18n="teacher"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="username"></span><b id="teacher-profile-username"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="email"></span><b id="teacher-email"></b></div>
+  </section>
+  <section class="card col-8">
+    <div class="teacher-section-heading">
+      <h3 data-i18n="teacher_quick_links"></h3>
+    </div>
+    <div class="teacher-actions">
+      <a class="btn btn-navy" href="admin.html?tab=students"><span>🎓</span><span data-i18n="students"></span></a>
+      <a class="btn btn-navy" href="admin.html?tab=schedule"><span>🗓️</span><span data-i18n="schedule"></span></a>
+      <a class="btn btn-navy" href="admin.html?tab=learning"><span>📝</span><span data-i18n="teacher_manage_learning"></span></a>
+      <a class="btn btn-navy" href="admin.html?tab=resources"><span>📄</span><span data-i18n="resources_admin"></span></a>
+    </div>
+  </section>
+
+  <section class="card col-12">
+    <div class="teacher-section-heading">
+      <h3 data-i18n="teacher_students"></h3>
+      <a class="btn btn-ghost btn-sm" href="admin.html?tab=students" data-i18n="teacher_manage_students"></a>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th data-i18n="name_en"></th><th data-i18n="username"></th><th data-i18n="dept"></th><th data-i18n="stage"></th><th data-i18n="class_name"></th><th data-i18n="teacher_sharing_status"></th></tr></thead>
+      <tbody id="teacher-students-list"></tbody></table>
+    </div>
+  </section>
+
+  <section class="card col-12">
+    <h3 data-i18n="teacher_message_title"></h3>
+    <form id="teacher-message-form">
+      <div class="form-grid">
+        <div class="field"><label for="teacher-message-channel" data-i18n="teacher_message_channel"></label>
+          <select class="input" id="teacher-message-channel"><option value="sms" data-i18n="teacher_message_sms"></option><option value="whatsapp" data-i18n="teacher_message_whatsapp"></option></select></div>
+      </div>
+      <div class="field"><label data-i18n="teacher_message_recipients"></label><div id="teacher-message-recipients" class="form-grid"></div></div>
+      <div class="field"><label for="teacher-message-body" data-i18n="teacher_message_body"></label><textarea id="teacher-message-body" class="input" maxlength="1000" required></textarea></div>
+      <button class="btn btn-gold" type="submit" data-i18n="teacher_message_send"></button>
+    </form>
+  </section>
+
+  <section class="card col-12">
+    <div class="teacher-section-heading">
+      <h3 data-i18n="attendance_paper"></h3>
+      <a class="btn btn-ghost btn-sm" href="admin.html?tab=attendance" data-i18n="attendance_admin"></a>
+    </div>
+    <form id="teacher-attendance-form">
+      <div class="form-grid">
+        <div class="field"><label for="attendance-class" data-i18n="class_name"></label><input id="attendance-class" class="input" required maxlength="120"></div>
+        <div class="field"><label for="attendance-date" data-i18n="date"></label><input id="attendance-date" class="input" type="date" required></div>
+        <div class="field"><label for="attendance-stage" data-i18n="stage"></label><select id="attendance-stage" class="input" required></select></div>
+      </div>
+      <div class="table-wrap attendance-paper-wrap">
+        <table class="attendance-paper">
+          <thead><tr><th data-i18n="number"></th><th data-i18n="student_name"></th><th data-i18n="attendance_status"></th><th data-i18n="time_in"></th><th data-i18n="time_out"></th><th data-i18n="signature"></th></tr></thead>
+          <tbody id="teacher-attendance-roster"></tbody>
+        </table>
+      </div>
+      <p class="muted" id="teacher-attendance-empty" data-i18n="attendance_no_students" hidden></p>
+      <div class="row-actions attendance-submit-row">
+        <button class="btn btn-gold" type="submit" data-i18n="submit_attendance"></button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card col-6">
+    <div class="teacher-section-heading">
+      <h3 data-i18n="teacher_upcoming"></h3>
+      <a class="btn btn-ghost btn-sm" href="admin.html?tab=schedule" data-i18n="teacher_manage_schedule"></a>
+    </div>
+    <div id="teacher-schedule-list"></div>
+  </section>
+  <section class="card col-6">
+    <div class="teacher-section-heading">
+      <h3 data-i18n="teacher_assignments"></h3>
+      <a class="btn btn-ghost btn-sm" href="admin.html?tab=learning" data-i18n="teacher_manage_learning"></a>
+    </div>
+    <div id="teacher-assignments-list"></div>
+  </section>
+
+  <section class="card col-12">
+    <div class="teacher-section-heading">
+      <h3 data-i18n="teacher_resources"></h3>
+      <a class="btn btn-ghost btn-sm" href="admin.html?tab=resources" data-i18n="teacher_manage_resources"></a>
+    </div>
+    <p class="muted" data-i18n="teacher_resource_note"></p>
+    <div id="teacher-resources-list"></div>
+  </section>
+
+  <section class="card col-12">
+    <h3 data-i18n="announcements"></h3>
+    <div id="teacher-announcements-list"></div>
+  </section>
+  <section class="card col-12">
+    <h3 data-i18n="ai_helper"></h3>
+    <form id="teacher-ai-form"><div class="field"><textarea id="teacher-ai-question" class="input" required maxlength="2000" data-i18n-ph="ai_placeholder"></textarea></div>
+      <button class="btn btn-gold" data-i18n="ai_ask"></button></form>
+    <div id="teacher-ai-answer" class="muted teacher-ai-answer"></div>
+  </section>
+</main>
+<div id="toast"></div>
+<script src="js/supabase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/common.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/teacher.js"></script>
+</body>
+</html>

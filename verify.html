@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificate Verification · VIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="verify-wrap">
+  <nav class="navbar" style="background:transparent;backdrop-filter:none">
+    <div class="container">
+      <a class="brand" href="index.html"><img class="logo" src="assets/institute-logo.jpg" alt="Vocational Institute of Sulaimanyah seal"><span>Vocational Institute of Sulaimanyah</span></a>
+      <div class="nav-cta" style="margin-inline-start:auto">
+        <div class="lang-switch" id="lang-switch"></div>
+        <button class="lang-btn theme-toggle" style="border-radius:8px" title="Theme">🌙</button>
+      </div>
+    </div>
+  </nav>
+  <div class="verify-main">
+    <div class="verify-card">
+      <div class="kicker">🏅</div>
+      <h2 class="auth-title" data-i18n="verify_title" style="font-size:1.6rem"></h2>
+      <p class="muted" style="margin-bottom:22px" data-i18n="verify_sub"></p>
+      <form id="verify-form">
+        <div class="field"><input id="v-code" class="input code-input" placeholder="VIS-XXXXXX" maxlength="12" required></div>
+        <button class="btn btn-gold btn-block" data-i18n="verify_btn"></button>
+      </form>
+      <div class="verify-result" id="v-result"></div>
+      <p style="margin-top:22px"><a href="index.html" class="muted" data-i18n="back_home"></a></p>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="js/supabase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/common.js"></script>
+<script src="js/verify.js"></script>
+</body>
+</html>

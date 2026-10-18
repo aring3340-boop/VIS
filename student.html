@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Panel · VIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="dash-hero">
+  <div class="container">
+    <span class="avatar" style="width:56px;height:56px;font-size:1.4rem;margin:0">🎓</span>
+    <div style="flex:1;min-width:200px">
+      <p style="color:#b9c6da"><span data-i18n="welcome"></span>, <b id="st-name" style="color:#fff"></b></p>
+      <p style="color:#8fa1bd;font-size:.85rem">@<span id="st-user"></span></p>
+    </div>
+    <a class="btn btn-outline btn-sm" href="index.html" data-i18n="view_site"></a>
+    <div class="lang-switch" id="lang-switch"></div>
+    <button class="lang-btn theme-toggle" title="Theme">🌙</button>
+    <button class="btn btn-outline btn-sm" id="btn-logout" data-i18n="logout"></button>
+  </div>
+</div>
+
+<div class="container dash-grid">
+  <div class="card col-4">
+    <h3 data-i18n="my_profile"></h3>
+    <div class="grade-bar"><span class="muted" data-i18n="dept"></span><b id="st-dept"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="stage"></span><b id="st-stage"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="class_name"></span><b id="st-class"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="phone_l"></span><b id="st-phone"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="email"></span><b id="st-email" style="word-break:break-all"></b></div>
+    <div class="grade-bar"><span class="muted" data-i18n="dob"></span><b id="st-dob"></b></div>
+    <div class="grade-bar" style="border:none"><span class="muted" data-i18n="attendance"></span><b id="st-att-num" class="gold"></b></div>
+    <div class="progress"><div id="att-bar" style="width:0%"></div></div>
+    <div id="cert-box" style="margin-top:16px"></div>
+  </div>
+
+  <section class="card col-6" id="student-exam-results">
+    <h3 data-i18n="exam_results"></h3>
+    <div id="student-exam-results-content"></div>
+  </section>
+
+  <div class="card col-4">
+    <h3 data-i18n="my_grades"></h3>
+    <div id="grades-list"></div>
+    <hr class="divider">
+    <div class="grade-bar" style="border:none"><b data-i18n="average"></b><b class="gold" id="st-avg"></b></div>
+    <button class="btn btn-gold btn-block" style="margin-top:14px" id="btn-transcript">⬇ <span data-i18n="download_transcript"></span></button>
+  </div>
+
+  <div class="card col-12">
+    <h3 data-i18n="schedule_title"></h3>
+    <div id="schedule-list"></div>
+  </div>
+
+  <div class="card col-12">
+    <h3 data-i18n="assignments"></h3>
+    <div id="assignments-list"></div>
+  </div>
+
+  <div class="card col-12">
+    <h3 data-i18n="materials"></h3>
+    <div id="materials-list"></div>
+  </div>
+
+  <div class="card col-12">
+    <h3 data-i18n="resource_title"></h3>
+    <p class="muted" data-i18n="resource_private_note"></p>
+    <div id="student-resources-list"></div>
+  </div>
+
+  <div class="card col-6">
+    <h3>📅 <span data-i18n="att_m"></span></h3>
+    <div id="att-wrap"><div id="att-cal"></div></div>
+  </div>
+
+  <section class="card col-6">
+    <h3 data-i18n="attendance_history"></h3>
+    <div id="student-attendance-history"></div>
+  </section>
+
+  <div class="card col-6">
+    <h3>🔔 <span data-i18n="notifs"></span></h3>
+    <div id="notif-list"></div>
+  </div>
+
+  <div class="card col-12">
+    <h3 data-i18n="announcements"></h3>
+    <div id="ann-list"></div>
+  </div>
+  <div class="card col-12">
+    <h3 data-i18n="ai_helper"></h3>
+    <form id="ai-form"><div class="field"><textarea id="ai-question" class="input" required maxlength="2000" data-i18n-ph="ai_placeholder"></textarea></div>
+      <button class="btn btn-gold" data-i18n="ai_ask"></button></form>
+    <div id="ai-answer" class="muted" style="white-space:pre-wrap;margin-top:14px"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="js/supabase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/common.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/extended.js"></script>
+<script src="js/student.js"></script>
+</body>
+</html>

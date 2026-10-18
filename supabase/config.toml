@@ -1,0 +1,10 @@
+project_id = "vis-institute"
+
+[functions.setup-owner]
+verify_jwt = false
+
+[functions.notify-students]
+verify_jwt = false
+
+[functions.student-signup]
+verify_jwt = false

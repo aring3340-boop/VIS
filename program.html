@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Explore department courses, program information, certificates and potential career paths at the Vocational Institute of Sulaimanyah.">
+<title>Departments · Vocational Institute of Sulaimanyah</title>
+<link rel="icon" href="assets/institute-logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="public-site program-page">
+<nav class="navbar">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <img class="logo" src="assets/institute-logo.jpg" alt="Vocational Institute of Sulaimanyah seal">
+      <span id="site-name">Vocational Institute of Sulaimanyah</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#about" data-i18n="about"></a>
+      <a href="index.html#programs" data-i18n="programs"></a>
+      <a href="index.html#contact" data-i18n="contact"></a>
+    </div>
+    <div class="nav-cta">
+      <div class="lang-switch" id="lang-switch"></div>
+      <button class="lang-btn theme-toggle" style="border-radius:8px" title="Theme">🌙</button>
+      <a class="btn btn-gold btn-sm" href="login.html" data-i18n="login"></a>
+    </div>
+    <button class="burger" id="burger" aria-label="Open navigation">☰</button>
+  </div>
+</nav>
+<main>
+  <section class="section">
+    <div class="container program-detail-wrap">
+      <a class="program-back" href="index.html#programs">← <span data-i18n="program_breadcrumb"></span></a>
+      <div id="program-content"></div>
+      <p class="lead program-page-note" data-i18n="department_note"></p>
+      <a class="btn btn-gold" href="index.html#contact" data-i18n="department_page_contact"></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="container footer-bottom">© <span id="year"></span> <span id="site-name-footer"></span> · VIS</div>
+</footer>
+<script src="js/supabase-config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/common.js"></script>
+<script src="js/public.js"></script>
+<script src="js/program.js"></script>
+<script>
+document.getElementById('burger').onclick=()=>document.querySelector('.navbar').classList.toggle('open');
+document.querySelectorAll('.nav-links a').forEach(a=>a.onclick=()=>document.querySelector('.navbar').classList.remove('open'));
+</script>
+</body>
+</html>
