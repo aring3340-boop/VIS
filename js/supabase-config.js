@@ -1,7 +1,7 @@
 /* Supabase project settings. The anon key is public; database access is enforced by RLS. */
 const SUPABASE_CONFIG={
-  url:'https://PASTE_YOUR_PROJECT_REF.supabase.co',
-  anonKey:'PASTE_YOUR_SUPABASE_ANON_KEY'
+  url:'https://VIS-institute.suly.co',
+  anonKey:'sb_publishable_6dQazi7-Uoh7kHuar2X3Gw_oWD_-nW6'
 };
 function supabaseConfigured(){
   return SUPABASE_CONFIG.url.startsWith('https://')
