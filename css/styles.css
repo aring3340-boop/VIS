@@ -40,6 +40,7 @@ a{color:inherit;text-decoration:none}
 
 /* navbar */
 .navbar{position:sticky;top:0;z-index:50;background:rgba(77,77,79,.96);backdrop-filter:blur(12px);color:#fff}
+.public-preview-notice{padding:12px 4%;background:#fff3cd;color:#664d03;text-align:center;font-weight:700;border-bottom:1px solid #e6d38a}
 .navbar .container{display:flex;align-items:center;gap:26px;height:72px}
 .brand{display:flex;align-items:center;gap:12px;font-weight:800}
 .brand .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#80613e);display:grid;place-items:center;color:#fff;font-weight:900;font-size:1rem;box-shadow:0 5px 14px rgba(128,97,62,.28);flex:none}

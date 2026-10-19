@@ -64,6 +64,7 @@ en:{
  student_projects:'Student projects',
  photo_url_invalid:'Photo URL must use HTTPS.',
  admin_save_error:'Could not save changes. Please check your connection and try again.',
+ public_preview_notice:'The live content service is unavailable. This preview uses local sample content; contact messages and changes are currently disabled.',
  admission_ref:'Reference',
  brand_sub:'Vocational Institute of Sulaimanyah',
  hero_kicker:'Accredited Vocational Education · Sulaymaniyah',
@@ -253,6 +254,7 @@ ku:{
  student_projects:'پڕۆژەکانی قوتابیان',
  photo_url_invalid:'لینکی وێنە دەبێت HTTPS بێت.',
  admin_save_error:'پاشەکەوتکردنی گۆڕانکاری سەرکەوتوو نەبوو. پەیوەندیی ئینتەرنێت بپشکنە و دووبارە هەوڵ بدە.',
+ public_preview_notice:'خزمەتگوزاری ناوەڕۆکی ڕاستەوخۆ بەردەست نییە. ئەم پێشبینینە ناوەڕۆکی نموونەیی بەکاردەهێنێت؛ ناردنی پەیام و گۆڕانکارییەکان لە ئێستادا ناچالاکن.',
  admission_ref:'ئاماژە',
  brand_sub:'پەیمانگەی پیشەیی سلێمانی',
  hero_kicker:'پەروەردەی پیشەیی پەسەندکراو · سلێمانی',
@@ -437,6 +439,25 @@ async function boot(render){
     applyTheme();window.renderPage=render;applyI18n();
   }catch(error){
     console.error('VIS initialization failed:',error);
+    if(document.body.classList.contains('public-site')){
+      try{
+        Store.mode='local';
+        Store.db=Store.auth=Store.storage=Store.functions=Store.supabase=null;
+        await Store.localInit();
+        applyTheme();window.renderPage=render;
+        const notice=document.createElement('div');
+        notice.className='public-preview-notice';
+        notice.setAttribute('role','status');
+        notice.dataset.i18n='public_preview_notice';
+        document.querySelector('.navbar')?.before(notice);
+        const contactForm=document.getElementById('contact-form');
+        contactForm?.querySelectorAll('input,textarea,button').forEach(control=>{control.disabled=true;});
+        applyI18n();
+        return;
+      }catch(fallbackError){
+        console.error('VIS public preview initialization failed:',fallbackError);
+      }
+    }
     const alert=document.createElement('div');
     alert.className='panel';
     alert.setAttribute('role','alert');

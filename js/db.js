@@ -16,6 +16,16 @@ async function loadSupabaseSDK(){
   await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
 }
 
+function supabaseFetchWithTimeout(input,init={}){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),8000);
+  if(init.signal){
+    if(init.signal.aborted)controller.abort(init.signal.reason);
+    else init.signal.addEventListener('abort',()=>controller.abort(init.signal.reason),{once:true});
+  }
+  return fetch(input,{...init,signal:controller.signal}).finally(()=>clearTimeout(timer));
+}
+
 function supabaseError(error){return error instanceof Error?error:new Error(error?.message||'Supabase request failed.');}
 
 function makeDocumentSnapshot(row){
@@ -183,7 +193,7 @@ const Store={
   async init(){
     if(supabaseConfigured()){
       await loadSupabaseSDK();
-      this.supabase=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey);
+      this.supabase=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey,{global:{fetch:supabaseFetchWithTimeout}});
       this.db=makeDatabaseAdapter(this.supabase);
       this.auth=this.supabase.auth;
       this.storage=makeStorageAdapter(this.supabase);
