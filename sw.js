@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vis-shell-v7';
+const CACHE_NAME = 'vis-shell-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -43,6 +43,19 @@ self.addEventListener('fetch', event => {
       if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
       return response;
     }).catch(async () => (await caches.match(request)) || (await caches.match('./index.html'))));
+    return;
+  }
+  if (/\.(?:js|css)$/.test(url.pathname)) {
+    event.respondWith(fetch(request, { cache: 'no-cache' }).then(response => {
+      if (response.ok) {
+        caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+      }
+      return response;
+    }).catch(async () => {
+      const cached = await caches.match(request);
+      if (cached) return cached;
+      throw new Error(`No cached asset available for ${request.url}`);
+    }));
     return;
   }
   event.respondWith(caches.match(request).then(cached => cached || fetch(request)));

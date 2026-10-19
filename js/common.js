@@ -435,29 +435,36 @@ function mountLangSwitch(id){
 }
 async function boot(render){
   try{
-    await Store.init();
-    applyTheme();window.renderPage=render;applyI18n();
-  }catch(error){
-    console.error('VIS initialization failed:',error);
-    if(document.body.classList.contains('public-site')){
+    const publicSite=document.body.classList.contains('public-site');
+    if(publicSite&&supabaseConfigured()){
+      await Store.localInit();
+      Store.mode='local';
+      const contactForm=document.getElementById('contact-form');
+      const contactControls=contactForm?.querySelectorAll('input,textarea,button');
+      contactControls?.forEach(control=>{control.disabled=true;});
+      applyTheme();window.renderPage=render;applyI18n();
       try{
+        await Store.init();
+        contactControls?.forEach(control=>{control.disabled=false;});
+        applyI18n();
+      }catch(error){
+        console.error('VIS initialization failed:',error);
         Store.mode='local';
         Store.db=Store.auth=Store.storage=Store.functions=Store.supabase=null;
         await Store.localInit();
-        applyTheme();window.renderPage=render;
         const notice=document.createElement('div');
         notice.className='public-preview-notice';
         notice.setAttribute('role','status');
         notice.dataset.i18n='public_preview_notice';
         document.querySelector('.navbar')?.before(notice);
-        const contactForm=document.getElementById('contact-form');
-        contactForm?.querySelectorAll('input,textarea,button').forEach(control=>{control.disabled=true;});
         applyI18n();
-        return;
-      }catch(fallbackError){
-        console.error('VIS public preview initialization failed:',fallbackError);
       }
+      return;
     }
+    await Store.init();
+    applyTheme();window.renderPage=render;applyI18n();
+  }catch(error){
+    console.error('VIS initialization failed:',error);
     const alert=document.createElement('div');
     alert.className='panel';
     alert.setAttribute('role','alert');
