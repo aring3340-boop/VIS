@@ -69,13 +69,6 @@ if(sess){
           <td><span class="tag">${t(shared?'teacher_shared_readonly':'teacher_assigned')}</span></td></tr>`;
       }).join('')||`<tr><td colspan="6" class="muted">${t('teacher_no_students')}</td></tr>`;
 
-      const messageChannel=document.getElementById('teacher-message-channel').value;
-      const consentField=messageChannel==='sms'?'smsOptIn':'whatsappOptIn';
-      const messageTargets=Store.data.students.filter(student=>
-        student.teacherId===sess.id&&student[consentField]===true&&/^\+[1-9]\d{7,14}$/.test(String(student.phone||'')));
-      document.getElementById('teacher-message-recipients').innerHTML=messageTargets.map(student=>
-        `<label class="check"><input type="checkbox" value="${esc(student.id)}"> ${esc(student.name_en||student.username)} · ${esc(student.phone)}</label>`
-      ).join('')||`<p class="muted">${t('teacher_message_no_eligible')}</p>`;
 
       document.getElementById('teacher-schedule-list').innerHTML=upcoming.slice(0,5).map(item=>
         `<article class="announce"><small>${fmtDate(item.date)} · ${esc(item.startTime||'')}${item.endTime?`–${esc(item.endTime)}`:''}</small><br>
@@ -118,36 +111,6 @@ if(sess){
       button.disabled=true;
       try{await Store.downloadResourceFile(resource);}
       catch(error){console.error('Could not download teacher resource:',error);toast(t('resource_download_error'),false);}
-      finally{button.disabled=false;}
-    });
-    document.getElementById('teacher-ai-form').addEventListener('submit',async event=>{
-      event.preventDefault();
-      const button=event.currentTarget.querySelector('button');
-      const answer=document.getElementById('teacher-ai-answer');
-      button.disabled=true;answer.textContent='…';
-      try{answer.textContent=await askAI(document.getElementById('teacher-ai-question').value);}
-      catch(error){answer.textContent=error.message||t('ai_error');}
-      finally{button.disabled=false;}
-    });
-    document.getElementById('teacher-message-channel').addEventListener('change',render);
-    document.getElementById('teacher-message-form').addEventListener('submit',async event=>{
-      event.preventDefault();
-      const form=event.currentTarget;
-      const button=form.querySelector('button[type="submit"]');
-      const studentIds=[...document.querySelectorAll('#teacher-message-recipients input:checked')].map(input=>input.value);
-      if(!studentIds.length){toast(t('err_fill'),false);return;}
-      button.disabled=true;
-      try{
-        const {data,error}=await Store.supabase.functions.invoke('send-student-message',{body:{
-          studentIds,channel:document.getElementById('teacher-message-channel').value,
-          message:document.getElementById('teacher-message-body').value.trim()
-        }});
-        if(error)throw new Error(data?.error||error.message);
-        const resultMessage=t(data.failed?'teacher_message_partial':'teacher_message_sent')
-          .replace('{delivered}',String(data.delivered)).replace('{failed}',String(data.failed||0)).replace('{skipped}',String(data.skipped));
-        toast(resultMessage,!data.failed);
-        document.getElementById('teacher-message-body').value='';
-      }catch(error){console.error('Could not send teacher message:',error);toast(error.message||t('signup_error'),false);}
       finally{button.disabled=false;}
     });
     document.getElementById('attendance-stage').addEventListener('change',renderAttendanceRoster);

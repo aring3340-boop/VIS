@@ -13,7 +13,7 @@ var VisExtended = (() => {
     result_download:'Download PDF',
     backup_download:'Download JSON backup',
     backup_upload:'Restore from JSON backup',
-    backup_warning:'Backups contain student and institute data. Store them securely. Supabase Storage files and Authentication accounts are not included.',
+    backup_warning:'Backups contain institute and student data. Keep them private and store them securely.',
     restore_confirm:'Replace the application records in this site with the selected backup? This cannot be undone.',
     invalid_backup:'The selected file is not a valid VIS backup.',
     backup_restored:'Backup restored. Reloading the application.',
@@ -36,7 +36,7 @@ var VisExtended = (() => {
     return `<div class="panel"><h3>${tr('exam_results')}</h3>
       <div class="form-grid"><div class="field"><label>${tr('student_label')}</label><select class="input" id="exam-student">${students.map(student => `<option value="${escape(student.id)}">${escape(studentName(student))} (@${escape(student.username)})</option>`).join('')}</select></div>
       <div class="field"><label>${tr('exam_term')}</label><input class="input" id="exam-term" maxlength="80"></div>
-      <div class="field"><label>${tr('exam_pdf')}</label><input class="input" id="exam-file" type="file" accept=".pdf,application/pdf" required><small class="muted">${tr(Store.mode==='supabase'?'exam_pdf_hint':'exam_pdf_hint_demo')}</small></div></div>
+      <div class="field"><label>${tr('exam_pdf')}</label><input class="input" id="exam-file" type="file" accept=".pdf,application/pdf" required><small class="muted">${tr('exam_pdf_hint_demo')}</small></div></div>
       <button class="btn btn-gold" id="exam-save">${t('save')}</button></div>
       <div class="panel"><div class="table-wrap"><table><thead><tr><th>${tr('student_label')}</th><th>${tr('exam_term')}</th><th>${tr('exam_pdf')}</th><th>${t('date')}</th><th>${t('actions')}</th></tr></thead><tbody>${rows || `<tr><td colspan="5">${tr('no_exam_results')}</td></tr>`}</tbody></table></div></div>`;
   }
@@ -88,18 +88,13 @@ var VisExtended = (() => {
     imported.schedule=imported.schedule.map(({branchId,...entry})=>entry);
     imported.publicTimetable=imported.publicTimetable.map(({branchId,...entry})=>entry);
     imported.posts=imported.posts.filter(post=>post.type!=='alumni').map(({storyRole_en,storyRole_ku,...post})=>post);
-    imported.examResults=imported.examResults.filter(result=>Store.mode==='local'?(result.fileData||result.filePath):result.filePath);
+    imported.examResults=imported.examResults.filter(result=>result.fileData);
     const settings={...payload.data.settings};
     delete settings.employerPartners;
     delete settings.publicResources;
     const normalized={...payload,data:{...imported,settings}};
-    if (Store.mode === 'local') {
-      Store.data = {...Store.data, ...normalized.data};
-      Store.persist();
-      location.reload();
-      return;
-    }
-    await Store.functions.httpsCallable('restore-application-backup')({backup:normalized});
+    Store.data = {...Store.data, ...normalized.data};
+    Store.persist();
     location.reload();
   }
 

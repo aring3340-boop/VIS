@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; connect-src 'self' data: blob:; img-src 'self' data: blob:; font-src 'self' data: blob:; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:">
 <title>Teacher Portal · VIS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -74,18 +73,6 @@
     </div>
   </section>
 
-  <section class="card col-12">
-    <h3 data-i18n="teacher_message_title"></h3>
-    <form id="teacher-message-form">
-      <div class="form-grid">
-        <div class="field"><label for="teacher-message-channel" data-i18n="teacher_message_channel"></label>
-          <select class="input" id="teacher-message-channel"><option value="sms" data-i18n="teacher_message_sms"></option><option value="whatsapp" data-i18n="teacher_message_whatsapp"></option></select></div>
-      </div>
-      <div class="field"><label data-i18n="teacher_message_recipients"></label><div id="teacher-message-recipients" class="form-grid"></div></div>
-      <div class="field"><label for="teacher-message-body" data-i18n="teacher_message_body"></label><textarea id="teacher-message-body" class="input" maxlength="1000" required></textarea></div>
-      <button class="btn btn-gold" type="submit" data-i18n="teacher_message_send"></button>
-    </form>
-  </section>
 
   <section class="card col-12">
     <div class="teacher-section-heading">
@@ -139,15 +126,8 @@
     <h3 data-i18n="announcements"></h3>
     <div id="teacher-announcements-list"></div>
   </section>
-  <section class="card col-12">
-    <h3 data-i18n="ai_helper"></h3>
-    <form id="teacher-ai-form"><div class="field"><textarea id="teacher-ai-question" class="input" required maxlength="2000" data-i18n-ph="ai_placeholder"></textarea></div>
-      <button class="btn btn-gold" data-i18n="ai_ask"></button></form>
-    <div id="teacher-ai-answer" class="muted teacher-ai-answer"></div>
-  </section>
 </main>
 <div id="toast"></div>
-<script src="js/supabase-config.js"></script>
 <script src="js/db.js"></script>
 <script src="js/common.js"></script>
 <script src="js/auth.js"></script>

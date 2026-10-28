@@ -64,7 +64,8 @@ en:{
  student_projects:'Student projects',
  photo_url_invalid:'Photo URL must use HTTPS.',
  admin_save_error:'Could not save changes. Please check your connection and try again.',
- public_preview_notice:'The live content service is unavailable. This preview uses local sample content; contact messages and changes are currently disabled.',
+ public_preview_notice:'The live content service is unavailable. This preview uses sample data. Contact messages and edits are enabled in the local demo only; they are not sent to the institute or published.',
+ public_preview_demo_link:'Open the local demo editor',
  admission_ref:'Reference',
  brand_sub:'Vocational Institute of Sulaimanyah',
  hero_kicker:'Accredited Vocational Education · Sulaymaniyah',
@@ -77,17 +78,17 @@ en:{
  contact_title:'Contact Us',contact_lead:'Have a question about admissions or programs? Reach out and our team will help you.',
  address:'Address',phone:'Phone',email:'Email',office_hours:'Office hours',office_hours_en:'Office hours (English)',office_hours_ku:'Office hours (Kurdish)',follow_us:'Follow Us',
  your_name:'Your Name',your_email:'Your Email',your_phone:'Your Phone (optional)',your_message:'Your Message',
- send:'Send Message',msg_sent:'Message sent. We will contact you soon.',msg_fill:'Please fill in name, email and message.',
+ send:'Send Message',msg_sent:'Message sent. We will contact you soon.',preview_message_saved:'Saved in this browser only; the institute was not notified.',msg_fill:'Please fill in name, email and message.',
  footer_links:'Quick Links',footer_contact:'Contact',
  why_title:'Why Choose VIS',
  why_1:'Hands-on training in modern labs',why_2:'Certified, experienced instructors',
  why_3:'Career & job placement support',why_4:'Recognized vocational certificates',
- login_title:'Sign in to VIS',login_sub:'Use the credentials provided by the institute.',
+ login_title:'Sign in to VIS',login_sub:'Use the credentials provided by the institute.',use_demo_mode:'Use demo mode',use_live_mode:'Return to live login',
  student_signup:'Student sign up',signup_approval_note:'Verify your phone by SMS and WhatsApp. Your account remains inactive until an administrator approves your application.',
  whatsapp_alert_consent:'Receive alerts by WhatsApp',
  student_full_name:'Full name',phone_required:'Phone number (required, international format)',email_optional:'Email (optional)',
  signup_messaging_consent:'I agree to receive institute and teacher alerts by SMS and WhatsApp. Message and data rates may apply.',
- signup_code:'6-digit verification code',signup_send_code:'Send code by SMS + WhatsApp',signup_verify:'Verify number and submit application',signup_resend:'Resend verification code',
+ signup_age:'Age',signup_code:'6-digit verification code',signup_send_code:'Send code by SMS + WhatsApp',signup_verify:'Verify number and submit application',signup_resend:'Resend verification code',
  signup_code_sent:'A verification code was sent to your phone by SMS and WhatsApp.',signup_pending:'Phone verified. Your application is waiting for administrator approval. You can sign in after it is approved.',
  signup_error:'Could not submit your registration. Please try again.',login_pending:'Your phone is verified, but your student application is still awaiting administrator approval.',
  signup_cloud_required:'Student registration is available when the site is connected to its Supabase service.',
@@ -160,12 +161,12 @@ en:{
  cert_issued:'Certificate issued.',gen_cert:'Issue Certificate',code:'Code',issued:'Issued',copy:'Copy',copied:'Copied!',
  download_cert:'Download Certificate (PDF)',download_transcript:'Download Transcript (PDF)',
  verify_title:'Certificate Verification',verify_sub:'Enter the certificate code (e.g. VIS-ABC123) to verify its authenticity.',
- verify_btn:'Verify',verify_found:'This certificate is authentic.',verify_invalid:'No certificate found with this code.',
+ verify_btn:'Verify',verify_found:'This certificate is authentic.',verify_invalid:'No certificate found with this code.',verify_unavailable:'Certificate verification is unavailable while the live content service is offline.',
  holder:'Holder',program:'Program',issued_on:'Issued on',
  upload_img:'Upload Photo',caption_en:'Caption (English)',caption_ku:'Caption (Kurdish)',drop_hint:'Click to choose an image (max ~800 KB in demo mode)',
  notif:'Notification',send_notif:'Send Notification',notif_sent:'Notification sent.',audience:'Audience',all_students:'All students',
  msg_from:'From',msg_date:'Received',mark_read:'Mark read',unread:'Unread',read:'Read',
- mode_demo:'Demo mode (data saved in this browser only)',mode_supabase:'Connected to Supabase (shared data)',
+ mode_demo:'Demo mode (data saved in this browser only)',mode_supabase:'Connected to Supabase (shared data)',mode_unavailable:'Live service unavailable',
  exam_results:'Exam results',backup_restore:'Backup / restore',
  exam_pdf:'Exam result PDF',exam_pdf_hint:'Upload a PDF up to 10 MB.',exam_pdf_hint_demo:'Demo mode supports PDFs up to 200 KB.',
  exam_pdf_too_large:'The PDF exceeds the 10 MB limit.',exam_pdf_too_large_demo:'Demo mode supports PDFs up to 200 KB.',
@@ -254,7 +255,8 @@ ku:{
  student_projects:'پڕۆژەکانی قوتابیان',
  photo_url_invalid:'لینکی وێنە دەبێت HTTPS بێت.',
  admin_save_error:'پاشەکەوتکردنی گۆڕانکاری سەرکەوتوو نەبوو. پەیوەندیی ئینتەرنێت بپشکنە و دووبارە هەوڵ بدە.',
- public_preview_notice:'خزمەتگوزاری ناوەڕۆکی ڕاستەوخۆ بەردەست نییە. ئەم پێشبینینە ناوەڕۆکی نموونەیی بەکاردەهێنێت؛ ناردنی پەیام و گۆڕانکارییەکان لە ئێستادا ناچالاکن.',
+ public_preview_notice:'خزمەتگوزاری ناوەڕۆکی ڕاستەوخۆ بەردەست نییە. ئەم پێشبینینە داتای نموونەیی بەکاردەهێنێت. پەیام و دەستکارییەکان تەنها لە مۆدی تاقیکردنەوەی ناوخۆیی چالاکن؛ بۆ پەیمانگە نانێردرێن و بڵاو ناکرێنەوە.',
+ public_preview_demo_link:'کردنەوەی دەستکاریکەری تاقیکردنەوەی ناوخۆیی',
  admission_ref:'ئاماژە',
  brand_sub:'پەیمانگەی پیشەیی سلێمانی',
  hero_kicker:'پەروەردەی پیشەیی پەسەندکراو · سلێمانی',
@@ -267,12 +269,12 @@ ku:{
  contact_title:'پەیوەندیمان پێوە بکە',contact_lead:'پرسیارت هەیە دەربارەی تۆمارکردن یان بەرنامەکان؟ پەیوەندی بکە و تیمی ئێمە یارمەتیت دەدات.',
  address:'ناونیشان',phone:'مۆبایل',email:'ئیمەیڵ',office_hours:'کاتەکانی کار',office_hours_en:'کاتەکانی کار (ئینگلیزی)',office_hours_ku:'کاتەکانی کار (کوردی)',follow_us:'فۆڵۆومان بکە',
  your_name:'ناوت',your_email:'ئیمەیڵەکەت',your_phone:'مۆبایلەکەت (ئارەزوومەندانە)',your_message:'پەیامەکەت',
- send:'ناردنی پەیام',msg_sent:'پەیامەکەت نێردرا. بەم زووانە پەیوەندیت پێوە دەکەین.',msg_fill:'تکایە ناو و ئیمەیڵ و پەیام پڕ بکە.',
+ send:'ناردنی پەیام',msg_sent:'پەیامەکەت نێردرا. بەم زووانە پەیوەندیت پێوە دەکەین.',preview_message_saved:'تەنها لەم وێبگەڕەدا پاشەکەوت کرا؛ پەیمانگە ئاگادار نەکراوەتەوە.',msg_fill:'تکایە ناو و ئیمەیڵ و پەیام پڕ بکە.',
  footer_links:'لینکە خێراکان',footer_contact:'پەیوەندی',
  why_title:'بۆچی VIS هەڵدەبژێریت',
  why_1:'ڕاهێنانی پراکتیکی لە تاقیگەی نوێدا',why_2:'مامۆستایانی شارەزا و بڕوانامەدار',
  why_3:'پشتیوانی دۆزینەوەی کار',why_4:'بڕوانامەی پیشەیی ناسراو',
- login_title:'چوونەژوورەوە بۆ VIS',login_sub:'زانیارییەکان کە پەیمانگە پێیدەدات بەکاربهێنە.',
+ login_title:'چوونەژوورەوە بۆ VIS',login_sub:'زانیارییەکان کە پەیمانگە پێیدەدات بەکاربهێنە.',use_demo_mode:'چوونەژوورەوە بۆ مۆدی تاقیکردنەوە',use_live_mode:'گەڕانەوە بۆ چوونەژوورەوەی ڕاستەقینە',
  student_signup:'تۆمارکردنی قوتابی',signup_approval_note:'ژمارەی مۆبایلەکەت بە کۆدی SMS و WhatsApp پشتڕاست بکەرەوە. هەژمارەکەت تا پەسەندکردنی بەڕێوەبەر چالاک نابێت.',
  student_full_name:'ناوی تەواو',phone_required:'ژمارەی مۆبایل (پێویستە، بە فۆرماتی نێودەوڵەتی)',email_optional:'ئیمەیڵ (ئارەزوومەندانە)',
  signup_messaging_consent:'ڕازیم ئاگادارکردنەوەکانی پەیمانگە و مامۆستایان بە SMS و WhatsApp وەربگرم. لەوانەیە کرێی نامە و داتا هەبێت.',
@@ -355,12 +357,12 @@ ku:{
  cert_issued:'بڕوانامە درا.',gen_cert:'دەرکردنی بڕوانامە',code:'کۆد',issued:'بەرواری دەرکردن',copy:'کۆپی',copied:'کۆپی کرا!',
  download_cert:'داگرتنی بڕوانامە (PDF)',download_transcript:'داگرتنی کارتی نمرەکان (PDF)',
  verify_title:'پشتڕاستکردنەوەی بڕوانامە',verify_sub:'کۆدی بڕوانامەکە دابنێ (بۆ نموونە VIS-ABC123) بۆ پشتڕاستکردنەوەی ڕاستی.',
- verify_btn:'پشتڕاستکردنەوە',verify_found:'ئەم بڕوانامەیە ڕاستە و دەسەلمێنرێت.',verify_invalid:'هیچ بڕوانامەیەک نەدۆزرایەوە بەم کۆدە.',
+ verify_btn:'پشتڕاستکردنەوە',verify_found:'ئەم بڕوانامەیە ڕاستە و دەسەلمێنرێت.',verify_invalid:'هیچ بڕوانامەیەک نەدۆزرایەوە بەم کۆدە.',verify_unavailable:'پشتڕاستکردنەوەی بڕوانامە کاتێک خزمەتگوزاری ناوەڕۆکی ڕاستەوخۆ بڕاوە بەردەست نییە.',
  holder:'خاوەن',program:'بەرنامە',issued_on:'بەرواری دەرکردن',
  upload_img:'بارکردنی وێنە',caption_en:'سەردێڕ (ئینگلیزی)',caption_ku:'سەردێڕ (کوردی)',drop_hint:'کرتە بکە بۆ هەڵبژاردنی وێنە (زۆرترین ~800 KB لە مۆدی تاقیکردنەوەدا)',
  notif:'ئاگادارکردنەوە',send_notif:'ناردنی ئاگادارکردنەوە',notif_sent:'ئاگادارکردنەوەکە نێردرا.',audience:'ئامادە',all_students:'هەموو قوتابیان',
  msg_from:'لایەن',msg_date:'وەرگیراو',mark_read:'نیشانکردن وەک خوێنراوە',unread:'نەخوێنراوە',read:'خوێنراوە',
- mode_demo:'مۆدی تاقیکردنەوە (داتا تەنها لەم وێبگەڕەدا پاشەکەوت دەکرێت)',mode_supabase:'پەیوەستە بە Supabase (داتای هاوبەش)',
+ mode_demo:'مۆدی تاقیکردنەوە (داتا تەنها لەم وێبگەڕەدا پاشەکەوت دەکرێت)',mode_supabase:'پەیوەستە بە Supabase (داتای هاوبەش)',mode_unavailable:'خزمەتگوزاری ڕاستەوخۆ بەردەست نییە',
  exam_results:'ئەنجامی تاقیکردنەوە',backup_restore:'پاڵپشتی / گەڕاندنەوە',
  exam_pdf:'PDFی ئەنجامی تاقیکردنەوە',exam_pdf_hint:'فایلی PDF تا ١٠ مێگابایت باربکە.',exam_pdf_hint_demo:'لە مۆدی تاقیکردنەوەدا تەنها PDF تا ٢٠٠ کیلۆبایت پشتگیری دەکرێت.',
  exam_pdf_too_large:'قەبارەی PDF لە ١٠ مێگابایت زیاترە.',exam_pdf_too_large_demo:'لە مۆدی تاقیکردنەوەدا تەنها PDF تا ٢٠٠ کیلۆبایت پشتگیری دەکرێت.',
@@ -410,22 +412,7 @@ function toast(msg,ok=true){
   el.textContent=msg;el.className='show '+(ok?'ok':'bad');
   clearTimeout(_toastT);_toastT=setTimeout(()=>{el.className=''},2800);
 }
-async function askAI(prompt){
-  if(Store.mode!=='supabase'||!Store.functions)throw new Error(t('ai_requires_cloud'));
-  const result=await Store.functions.httpsCallable('ask-tutor')({prompt:String(prompt||'').trim().slice(0,2000)});
-  return result.data.answer||'';
-}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function whatsappHref(value){
-  try{
-    const url=new URL(String(value||''));
-    if(url.protocol!=='https:'||url.username||url.password)return null;
-    if(url.hostname==='wa.me'&&/^\/\d{7,15}\/?$/.test(url.pathname))return url.href;
-    const phone=url.searchParams.get('phone')||'';
-    if(url.hostname==='api.whatsapp.com'&&url.pathname==='/send'&&/^\d{7,15}$/.test(phone))return url.href;
-  }catch(e){}
-  return null;
-}
 function fmtDate(d){try{return new Date(d).toLocaleDateString(Vis.lang==='ku'?'ckb-IQ':'en-GB',{year:'numeric',month:'long',day:'numeric'})}catch(e){try{return new Date(d).toLocaleDateString('en-GB')}catch(e2){return d}}}
 function uid(p){return p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function mountLangSwitch(id){
@@ -435,32 +422,6 @@ function mountLangSwitch(id){
 }
 async function boot(render){
   try{
-    const publicSite=document.body.classList.contains('public-site');
-    if(publicSite&&supabaseConfigured()){
-      await Store.localInit();
-      Store.mode='local';
-      const contactForm=document.getElementById('contact-form');
-      const contactControls=contactForm?.querySelectorAll('input,textarea,button');
-      contactControls?.forEach(control=>{control.disabled=true;});
-      applyTheme();window.renderPage=render;applyI18n();
-      try{
-        await Store.init();
-        contactControls?.forEach(control=>{control.disabled=false;});
-        applyI18n();
-      }catch(error){
-        console.error('VIS initialization failed:',error);
-        Store.mode='local';
-        Store.db=Store.auth=Store.storage=Store.functions=Store.supabase=null;
-        await Store.localInit();
-        const notice=document.createElement('div');
-        notice.className='public-preview-notice';
-        notice.setAttribute('role','status');
-        notice.dataset.i18n='public_preview_notice';
-        document.querySelector('.navbar')?.before(notice);
-        applyI18n();
-      }
-      return;
-    }
     await Store.init();
     applyTheme();window.renderPage=render;applyI18n();
   }catch(error){
@@ -468,7 +429,7 @@ async function boot(render){
     const alert=document.createElement('div');
     alert.className='panel';
     alert.setAttribute('role','alert');
-    alert.textContent=`Could not connect to the configured Supabase project. ${error.message||'Check the project URL, public key, database migration, and network connection.'}`;
+    alert.textContent=`Could not load local application data. ${error.message||'Check browser storage and try again.'}`;
     document.body.prepend(alert);
   }
 }
@@ -549,72 +510,37 @@ function downloadCSV(filename,rows){
   document.body.appendChild(a);a.click();a.remove();
 }
 
-/* ===== PDF generators (jsPDF via CDN) ===== */
-function pdfReady(){return !!(window.jspdf&&window.jspdf.jsPDF);}
-function transcriptPDF(stu){
-  if(!pdfReady()){toast(t('pdf_fail'),false);return;}
-  const {jsPDF}=window.jspdf;const doc=new jsPDF();
-  const s=Store.data.settings;
-  doc.setFillColor(10,25,49);doc.rect(0,0,210,34,'F');
-  doc.setTextColor(201,162,39);doc.setFontSize(15);doc.setFont('helvetica','bold');
-  doc.text(s.siteName_en||'Vocational Institute of Sulaimanyah',105,14,{align:'center'});
-  doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont('helvetica','normal');
-  doc.text('OFFICIAL TRANSCRIPT · کارتی نمرەی فەرمی',105,24,{align:'center'});
-  doc.setTextColor(30,39,51);doc.setFontSize(10);
-  let y=48;
-  doc.setFont('helvetica','bold');doc.text('Student / قوتابی:',14,y);
-  doc.setFont('helvetica','normal');doc.text(stu.name_en||'',52,y);
-  y+=7;doc.setFont('helvetica','bold');doc.text('Department / بەش:',14,y);
-  doc.setFont('helvetica','normal');doc.text((DEPTS[stu.dept]&&DEPTS[stu.dept].en)||stu.dept||'',52,y);
-  y+=7;doc.setFont('helvetica','bold');doc.text('Stage / قۆناغ:',14,y);
-  doc.setFont('helvetica','normal');doc.text(String(stu.stage||''),52,y);
-  y+=10;
-  doc.setFillColor(232,238,247);doc.rect(14,y-5,182,8,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(9);
-  doc.text('SUBJECT',18,y);doc.text('SCORE',170,y);
-  doc.setDrawColor(201,162,39);doc.line(14,y+2,196,y+2);
-  y+=9;doc.setFont('helvetica','normal');doc.setFontSize(10);
-  (stu.grades||[]).forEach(g=>{
-    doc.text(String(g.subject).slice(0,60),18,y);
-    doc.text(String(g.score)+'%',170,y);
-    doc.setDrawColor(220);doc.line(14,y+1.5,196,y+1.5);
-    y+=8;
-  });
-  const avg=(stu.grades&&stu.grades.length)?Math.round(stu.grades.reduce((a,g)=>a+Number(g.score||0),0)/stu.grades.length):0;
-  y+=6;doc.setFont('helvetica','bold');doc.setFontSize(11);
-  doc.text(`AVERAGE / اۆرتالێ: ${avg}%`,14,y);
-  y+=10;doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120);
-  doc.text('Issued on '+new Date().toLocaleDateString('en-GB')+' · '+synEmail(stu.username||''),14,y);
-  doc.text('Registrar signature: ______________________',120,y+10);
-  doc.save(`transcript_${(stu.username||'student')}.pdf`);
+/* Use the browser print dialog for printable documents without a downloaded library. */
+function printDocument(title,content){
+  const page=window.open('','_blank');
+  if(!page){toast(t('print_unavailable'),false);return;}
+  page.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
+    <style>body{font:16px Arial,sans-serif;color:#1e2733;margin:40px auto;max-width:850px;padding:0 24px}
+    h1{text-align:center;color:#10243b}h2{border-bottom:2px solid #c9a227;padding-bottom:8px}
+    table{width:100%;border-collapse:collapse;margin-top:20px}th,td{text-align:left;padding:10px;border-bottom:1px solid #ccd3dc}
+    .center{text-align:center}.signature{display:flex;justify-content:space-between;margin-top:70px}
+    @media print{body{margin:12mm auto} }</style></head><body>${content}</body></html>`);
+  page.document.close();
+  page.focus();
+  setTimeout(()=>page.print(),250);
 }
-function certificatePDF(stu,cert){
-  if(!pdfReady()){toast(t('pdf_fail'),false);return;}
-  const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  doc.setFillColor(10,25,49);doc.rect(0,0,297,24,'F');
-  doc.setTextColor(201,162,39);doc.setFontSize(16);doc.setFont('helvetica','bold');
-  doc.text('VOCATIONAL INSTITUTE OF SULAIMANYAH',148.5,10,{align:'center'});
-  doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','normal');
-  doc.text('CERTIFICATE OF COMPLETION · بڕوانامەی تەواوکردن',148.5,18,{align:'center'});
-  doc.setDrawColor(201,162,39);doc.setLineWidth(1.2);doc.rect(8,8,281,192);
-  doc.setLineWidth(.4);doc.rect(11,11,275,186);
-  doc.setTextColor(30,39,51);doc.setFontSize(13);doc.setFont('helvetica','italic');
-  doc.text('This is to certify that',148.5,55,{align:'center'});
-  doc.setFont('helvetica','bold');doc.setFontSize(26);
-  doc.text(stu.name_en||'',148.5,72,{align:'center'});
-  doc.setDrawColor(201,162,39);doc.setLineWidth(.8);doc.line(90,78,207,78);
-  doc.setFont('helvetica','italic');doc.setFontSize(13);
-  doc.text('has successfully completed the vocational program in',148.5,94,{align:'center'});
-  doc.setFont('helvetica','bold');doc.setFontSize(17);
-  doc.text((DEPTS[cert.program]&&DEPTS[cert.program].en)||cert.program||'',148.5,108,{align:'center'});
-  doc.setFont('helvetica','normal');doc.setFontSize(11);
-  doc.text(`Issued on ${fmtDate(cert.date)}   ·   Certificate Code: ${cert.code}`,148.5,126,{align:'center'});
-  doc.setFontSize(9);doc.setTextColor(130);
-  doc.text('Verify this certificate at our website — Certificate Verification page',148.5,136,{align:'center'});
-  doc.setTextColor(30,39,51);doc.setFontSize(12);
-  doc.text('________________________',55,168);
-  doc.text('Director',55,176);
-  doc.text('________________________',242,168);
-  doc.text('Registrar',242,176);
-  doc.save(`certificate_${cert.code}.pdf`);
+function transcriptPDF(student){
+  const grades=student.grades||[];
+  const average=grades.length?Math.round(grades.reduce((total,grade)=>total+Number(grade.score||0),0)/grades.length):0;
+  const rows=grades.map(grade=>`<tr><td>${esc(grade.subject)}</td><td>${esc(String(grade.score))}%</td></tr>`).join('');
+  printDocument('Student transcript',`<h1>${esc(Store.data.settings.siteName_en||'Vocational Institute of Sulaimanyah')}</h1>
+    <h2 class="center">OFFICIAL TRANSCRIPT</h2><p><b>Student:</b> ${esc(student.name_en||'')}</p>
+    <p><b>Department:</b> ${esc(DEPTS[student.dept]?.en||student.dept||'')}</p>
+    <p><b>Stage:</b> ${esc(String(student.stage||''))}</p>
+    <table><thead><tr><th>Subject</th><th>Score</th></tr></thead><tbody>${rows}</tbody></table>
+    <p><b>Average:</b> ${average}%</p><p>Issued on ${esc(new Date().toLocaleDateString('en-GB'))}</p>
+    <p class="signature">Registrar signature: ______________________</p>`);
+}
+function certificatePDF(student,certificate){
+  printDocument('Certificate',`<h1>VOCATIONAL INSTITUTE OF SULAIMANYAH</h1>
+    <h2 class="center">CERTIFICATE OF COMPLETION</h2><p class="center">This is to certify that</p>
+    <h2 class="center">${esc(student.name_en||'')}</h2><p class="center">has successfully completed the vocational program in</p>
+    <h2 class="center">${esc(DEPTS[certificate.program]?.en||certificate.program||'')}</h2>
+    <p class="center">Issued on ${esc(fmtDate(certificate.date))} · Certificate Code: ${esc(certificate.code)}</p>
+    <div class="signature"><span>________________________<br>Director</span><span>________________________<br>Registrar</span></div>`);
 }

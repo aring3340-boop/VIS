@@ -48,7 +48,7 @@ function renderPublic(){
   document.getElementById('office-hours-item').hidden=!officeHours;
   setText('footer-about',pick({en:s.about_en,ku:s.about_ku}));
   setText('stat-programs',d.programs.length);
-  setText('stat-students',Store.mode==='supabase'?(s.studentCount??'—'):d.students.length);
+  setText('stat-students',d.students.length);
   setText('stat-since',s.since);
   setText('footer-verify','· '+t('verify'));
   const y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();
@@ -83,30 +83,6 @@ function renderPublic(){
   document.getElementById('public-timetable').innerHTML=weekly.map(item=>
     `<tr><td>${t('weekday_'+Number(item.weekday))}</td><td>${esc(item.dept==='all'?t('all_students'):(DEPTS[item.dept]?.[Vis.lang]||item.dept))}</td><td>${Number(item.stage)||t('all_students')}</td><td>${esc(item.course)}</td><td>${esc(item.startTime||'')}${item.endTime?'–'+esc(item.endTime):''}</td><td>${esc(item.room||'')}</td></tr>`
   ).join('')||`<tr><td colspan="6" class="muted">${t('weekly_timetable_empty')}</td></tr>`;
-  const analyticsId=String(s.analyticsId||'').trim();
-  const analyticsAccepted=localStorage.getItem('vis_analytics_consent');
-  const analyticsBanner=document.getElementById('analytics-consent');
-  if(/^G-[A-Z0-9]+$/i.test(analyticsId)&&analyticsAccepted===null&&analyticsBanner)analyticsBanner.hidden=false;
-  if(/^G-[A-Z0-9]+$/i.test(analyticsId)&&analyticsAccepted==='accepted'&&!document.querySelector(`script[data-ga="${analyticsId}"]`)){
-    const script=document.createElement('script');
-    script.async=true;script.src=`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(analyticsId)}`;script.dataset.ga=analyticsId;
-    script.onload=()=>{window.dataLayer=window.dataLayer||[];window.gtag=function(){window.dataLayer.push(arguments);};window.gtag('js',new Date());window.gtag('config',analyticsId,{anonymize_ip:true});};
-    document.head.appendChild(script);
-  }
-
-  const icons={facebook:'f',instagram:'◎',youtube:'▶',telegram:'✈',whatsapp:'✆'};
-  const labels={facebook:'Facebook',instagram:'Instagram',youtube:'YouTube',telegram:'Telegram',whatsapp:'WhatsApp'};
-  const links=Object.entries(s.socials||{}).filter(([,v])=>v&&v.trim());
-  document.getElementById('socials-row').innerHTML=links.length
-    ? links.map(([k,v])=>`<a class="social-pill" href="${esc(v)}" target="_blank" rel="noopener"><b>${icons[k]||'#'}</b> ${labels[k]||esc(k)} ↗</a>`).join('')
-    : `<p class="muted" style="font-size:.85rem">${t('follow_us')}</p>`;
-
-  const whatsapp=document.getElementById('whatsapp-contact');
-  const configuredWhatsapp=s.socials?.whatsapp||'';
-  const whatsappUrl=whatsappHref(configuredWhatsapp);
-  if(configuredWhatsapp&&!whatsappUrl)console.warn('Ignoring invalid institute WhatsApp chat link in site settings.');
-  if(whatsappUrl){whatsapp.href=whatsappUrl;whatsapp.hidden=false;}
-  else{whatsapp.removeAttribute('href');whatsapp.hidden=true;}
 }
 
 /* contact form → messages */
@@ -120,5 +96,5 @@ if(publicContactForm)publicContactForm.addEventListener('submit',async e=>{
   if(!name||!email||!message){toast(t('msg_fill'),false);return;}
   await Store.setDoc('messages',{id:uid('m'),name,email,phone,message,date:new Date().toISOString().slice(0,10),read:false});
   e.target.reset();
-  toast(t('msg_sent'));
+  toast(t('preview_message_saved'));
 });

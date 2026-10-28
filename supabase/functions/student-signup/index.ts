@@ -34,10 +34,11 @@ Deno.serve(async (request) => {
       const email = String(body.email || "").trim().toLowerCase();
       const dept = String(body.dept || "");
       const stage = Number(body.stage);
+      const age = Number(body.age);
       const password = String(body.password || "");
       if (!/^[a-z0-9][a-z0-9._-]{2,39}$/.test(username) || name.length < 2 || name.length > 120
         || (email && !/^\S+@\S+\.\S+$/.test(email)) || !["it", "business", "health", "electrical"].includes(dept)
-        || !Number.isInteger(stage) || stage < 1 || stage > 5 || password.length < 8
+        || !Number.isInteger(stage) || stage < 1 || stage > 5 || !Number.isInteger(age) || age < 10 || age > 80 || password.length < 8
         || body.consent !== true) {
         return reply({ error: "Check the required details, password, and messaging consent." }, 400);
       }
@@ -68,7 +69,7 @@ Deno.serve(async (request) => {
       const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000).padStart(6, "0");
       const secret = Deno.env.get("SIGNUP_OTP_SECRET");
       if (!secret) throw new Error("Signup OTP secret is missing.");
-      const candidate = { username, name, email: email || "", phone, dept, stage, consent: true, consentAt: new Date(now).toISOString() };
+      const candidate = { username, name, email: email || "", phone, dept, stage, age, consent: true, consentAt: new Date(now).toISOString() };
       const { error: saveError } = await service.from("vis_student_signups").upsert({
         phone,
         username,

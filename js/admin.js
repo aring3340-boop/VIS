@@ -15,7 +15,7 @@ let showScheduleForm=false,scheduleEditId=null;
 let learningMode='assignments',showAssignmentForm=false,assignmentEditId=null,showMaterialForm=false,materialEditId=null;
 let instructorEditId=null,resourceEditId=null,staffEditId=null;
 
-const tabTitle={dash:'dash',students:'students',attendance:'attendance_admin',ai:'ai_helper',schedule:'schedule','exam-results':'exam_results',backup:'backup_restore',learning:'learning',
+const tabTitle={dash:'dash',students:'students',attendance:'attendance_admin',schedule:'schedule','exam-results':'exam_results',backup:'backup_restore',learning:'learning',
   resources:'resources_admin',msgs:'msgs',certs:'certs',website:'website_editor',staff:'staff_accounts',account:'account'};
 const requestedTab=new URLSearchParams(location.search).get('tab');
 if(Object.prototype.hasOwnProperty.call(tabTitle,requestedTab)
@@ -49,7 +49,7 @@ document.getElementById('btn-logout').onclick=async()=>{await Auth.logout();loca
 if(!isOwner(sess))document.getElementById('staff-tab').style.display='none';
 if(sess.role==='teacher')document.getElementById('teacher-portal-link').style.display='flex';
 if(sess.role==='teacher')document.querySelectorAll('.side-link[data-tab]').forEach(b=>{
-  if(!['dash','students','attendance','ai','schedule','learning','resources','account'].includes(b.dataset.tab))b.style.display='none';
+  if(!['dash','students','attendance','schedule','learning','resources','account'].includes(b.dataset.tab))b.style.display='none';
 });
 if(sess.role==='content_editor')document.querySelectorAll('.side-link[data-tab]').forEach(b=>{
   if(!['website','account'].includes(b.dataset.tab))b.style.display='none';
@@ -68,7 +68,6 @@ function render(){
   if(tab==='dash'){c.innerHTML=vDash();wireDash();}
   else if(tab==='students'){c.innerHTML=vStudents();wireStudents();}
   else if(tab==='attendance'){c.innerHTML=vAttendance();}
-  else if(tab==='ai'){c.innerHTML=vAI();}
   else if(tab==='schedule'){c.innerHTML=vSchedule();}
   else if(['exam-results','backup'].includes(tab)){c.innerHTML=VisExtended.renderAdmin(tab);}
   else if(tab==='learning'){c.innerHTML=vLearning();}
@@ -81,15 +80,11 @@ function render(){
 }
 function vWebsiteEditor(){
   const sections=[
-    ['content',vContent()],['socials',vSocials()],['programs_m',vPrograms()],['posts',vPosts()],
+    ['content',vContent()],['programs_m',vPrograms()],['posts',vPosts()],
     ['ev_m',vEvents()],['schedule',vSchedule()],['gal_m',vGallery()],['notifs',vNotifs()]
   ];
   return `<p class="lead website-editor-hint">${t('website_editor_hint')}</p>`+
     sections.map(([title,content],index)=>`<details class="website-editor-section"${index===0?' open':''}><summary>${t(title)}</summary>${content}</details>`).join('');
-}
-function validHttpsUrl(value){
-  try{const url=new URL(value);return url.protocol==='https:'&&!url.username&&!url.password;}
-  catch(error){return false;}
 }
 function vResources(){
   const entry=resourceEditId?Store.data.resources.find(item=>item.id===resourceEditId):null;
@@ -100,7 +95,7 @@ function vResources(){
       <div class="field"><label>${t('resource_title_en')}</label><input id="resource-title-en" class="input" maxlength="160" value="${esc(entry?.title_en||'')}"></div>
       <div class="field"><label>${t('resource_title_ku')}</label><input id="resource-title-ku" class="input" maxlength="160" dir="rtl" value="${esc(entry?.title_ku||'')}"></div>
     </div>
-    <div class="field"><label>${t('resource_file')}</label><input id="resource-file" class="input" type="file" accept=".pdf,application/pdf"><small class="muted">${t(Store.mode==='supabase'?'resource_file_large':'resource_file_large_demo')}</small></div>
+    <div class="field"><label>${t('resource_file')}</label><input id="resource-file" class="input" type="file" accept=".pdf,application/pdf"><small class="muted">${t('resource_file_large_demo')}</small></div>
     <div class="row-actions"><button class="btn btn-gold" id="resource-save">${t('save')}</button>${entry?`<button class="btn btn-ghost" id="resource-cancel">${t('cancel')}</button>`:''}</div></div>
     <div class="panel"><h3>${t('resources_admin')}</h3><div class="table-wrap"><table><thead><tr><th>${t('resource_category')}</th><th>${t('resource_title_en')}</th><th>${t('resource_file')}</th><th>${t('actions')}</th></tr></thead><tbody>
       ${Store.data.resources.map(item=>`<tr><td>${esc(item.category)}</td><td>${esc(item.title_en||item.title_ku)}</td><td><button class="btn btn-ghost btn-sm" data-resource-download="${esc(item.id)}">${t('resource_open')}</button> ${esc(item.fileName)}</td><td>${canEdit(item)?`<div class="row-actions"><button class="btn btn-ghost btn-sm" data-resource-edit="${esc(item.id)}">${t('edit')}</button><button class="btn btn-danger btn-sm" data-resource-delete="${esc(item.id)}">${t('del')}</button></div>`:`<span class="muted">—</span>`}</td></tr>`).join('')||`<tr><td colspan="4" class="muted">${t('resource_empty')}</td></tr>`}
@@ -146,7 +141,6 @@ function vInstructors(){
       <div class="field"><label>${t('instructor_qualifications')} (EN)</label><textarea id="inst-qualifications-en" class="input" maxlength="500">${esc(entry?.qualifications_en||'')}</textarea></div>
       <div class="field"><label>${t('instructor_qualifications')} (KU)</label><textarea id="inst-qualifications-ku" class="input" maxlength="500" dir="rtl">${esc(entry?.qualifications_ku||'')}</textarea></div>
     </div>
-    <div class="field"><label>${t('instructor_photo')}</label><input id="inst-photo" class="input" type="url" dir="ltr" maxlength="1000" value="${esc(entry?.photoUrl||'')}"></div>
     <label class="check instructor-consent"><input id="inst-consent" type="checkbox"><span>${t('instructor_consent')}</span></label>
     <div class="row-actions"><button class="btn btn-gold" id="inst-save">${t('save')}</button>${entry?`<button class="btn btn-ghost" id="inst-cancel">${t('cancel')}</button>`:''}</div>
     <p class="muted">${t('instructor_consent')}</p></div>
@@ -155,28 +149,21 @@ function vInstructors(){
     </tbody></table></div></div>`;
 }
 async function saveInstructor(){
-  const name_en=val('inst-name-en'),name_ku=val('inst-name-ku'),photoUrl=val('inst-photo');
+  const name_en=val('inst-name-en'),name_ku=val('inst-name-ku');
   if(!name_en&&!name_ku){toast(t('err_fill'),false);return;}
   if(!document.getElementById('inst-consent').checked){toast(t('instructor_consent_required'),false);return;}
-  if(photoUrl&&!validHttpsUrl(photoUrl)){toast(t('photo_url_invalid'),false);return;}
   const entry=instructorEditId?Store.data.instructors.find(item=>item.id===instructorEditId):null;
   const record={...(entry||{}),id:entry?.id||uid('instructor'),name_en,name_ku,
     role_en:val('inst-role-en'),role_ku:val('inst-role-ku'),
     bio_en:document.getElementById('inst-bio-en').value.trim(),bio_ku:document.getElementById('inst-bio-ku').value.trim(),
     subjects_en:val('inst-subjects-en'),subjects_ku:val('inst-subjects-ku'),
     qualifications_en:document.getElementById('inst-qualifications-en').value.trim(),
-    qualifications_ku:document.getElementById('inst-qualifications-ku').value.trim(),photoUrl};
+    qualifications_ku:document.getElementById('inst-qualifications-ku').value.trim()};
   await Store.setDoc('instructors',record);instructorEditId=null;toast(t('instructor_saved'));render();
 }
 async function runManagerSave(action){
   try{await action();}
   catch(error){console.error('Could not save manager changes:',error);toast(t('admin_save_error'),false);}
-}
-function vAI(){
-  return `<div class="panel"><h3>${t('ai_helper')}</h3><form id="ai-form">
-    <div class="field"><textarea id="ai-question" class="input" maxlength="2000" required placeholder="${t('ai_placeholder')}"></textarea></div>
-    <button class="btn btn-gold" data-i18n="ai_ask">${t('ai_ask')}</button></form>
-    <div id="ai-answer" class="muted" style="white-space:pre-wrap;margin-top:16px"></div></div>`;
 }
 function vSchedule(){
   const entries=[...Store.data.schedule].sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.startTime).localeCompare(String(b.startTime)));
@@ -224,7 +211,6 @@ function vLearning(){
       <div class="field"><label>${t('dept')}</label><select id="mat-dept" class="input"><option value="all">${t('all_students')}</option>${Object.keys(DEPTS).map(k=>`<option value="${k}" ${material?.dept===k?'selected':''}>${esc(DEPTS[k][Vis.lang])}</option>`).join('')}</select></div>
       <div class="field"><label>${t('stage')}</label><select id="mat-stage" class="input"><option value="0">${t('all_students')}</option>${Array.from({length:10},(_,i)=>i+1).map(n=>`<option value="${n}" ${Number(material?.stage)===n?'selected':''}>${n}</option>`).join('')}</select></div>
     </div><div class="field"><label>${t('instructions')}</label><textarea id="mat-body" class="input">${esc(material?.body||'')}</textarea></div>
-    <div class="field"><label>${t('resource')}</label><input id="mat-url" type="url" class="input" value="${esc(material?.url||'')}"></div>
     <div class="row-actions"><button class="btn btn-gold" id="mat-save">${t('save')}</button><button class="btn btn-ghost" id="mat-cancel">${t('cancel')}</button></div></div>`:'';
     return modes+form+`<div class="panel"><div class="search-row"><h3 style="margin:0">${t('materials')}</h3><span style="flex:1"></span><button class="btn btn-navy" id="mat-add">＋ ${t('add_material')}</button></div>
       <div class="table-wrap"><table><thead><tr><th>${t('title_en')}</th><th>${t('course')}</th><th>${t('dept')}</th><th>${t('stage')}</th><th>${t('actions')}</th></tr></thead><tbody>
@@ -254,7 +240,7 @@ async function saveAssignment(){
   const assignment=assignmentEditId?Store.data.assignments.find(x=>x.id===assignmentEditId):null;
   const title=val('as-title'),course=val('as-course'),dueDate=val('as-due');
   if(!title||!course||!dueDate){toast(t('err_fill'),false);return;}
-  const fields={title,course,dueDate,dueAt:Store.mode==='supabase'?new Date(`${dueDate}T23:59:59`).toISOString():null,
+  const fields={title,course,dueDate,dueAt:null,
     dept:val('as-dept'),stage:Number(val('as-stage')),instructions:document.getElementById('as-instructions').value.trim()};
   if(assignment){Object.assign(assignment,fields);await Store.setDoc('assignments',assignment);}
   else await Store.setDoc('assignments',{id:uid('as'),teacherId:sess.id,createdAt:new Date().toISOString(),...fields});
@@ -262,10 +248,9 @@ async function saveAssignment(){
 }
 async function saveMaterial(){
   const material=materialEditId?Store.data.materials.find(x=>x.id===materialEditId):null;
-  const title=val('mat-title'),course=val('mat-course'),body=document.getElementById('mat-body').value.trim(),url=val('mat-url');
-  if(!title||!course||(!body&&!url)){toast(t('err_fill'),false);return;}
-  if(url&&!/^https?:\/\//i.test(url)){toast(t('url_invalid'),false);return;}
-  const fields={title,course,body,url,dept:val('mat-dept'),stage:Number(val('mat-stage'))};
+  const title=val('mat-title'),course=val('mat-course'),body=document.getElementById('mat-body').value.trim();
+  if(!title||!course||!body){toast(t('err_fill'),false);return;}
+  const fields={title,course,body,dept:val('mat-dept'),stage:Number(val('mat-stage'))};
   if(material){Object.assign(material,fields);await Store.setDoc('materials',material);}
   else await Store.setDoc('materials',{id:uid('mat'),teacherId:sess.id,...fields});
   showMaterialForm=false;materialEditId=null;toast(t('learning_saved'));render();
@@ -338,7 +323,7 @@ function vStudents(){
       <div class="field"><label>${t('name_en')} *</label><input id="f-name-en" class="input" value="${esc(stu?.name_en||'')}"></div>
       <div class="field"><label>${t('name_ku')}</label><input id="f-name-ku" class="input" dir="rtl" value="${esc(stu?.name_ku||'')}"></div>
       <div class="field"><label>${t('username')} *</label><input id="f-user" class="input" value="${esc(stu?.username||'')}" ${stu?'disabled':''}></div>
-      <div class="field"><label>${stu?t('new_pw'):t('password')}${stu?'':' *'}</label><div class="password-input-wrap"><input id="f-pass" type="password" class="input" placeholder="${stu?'••••••':''}" autocomplete="new-password"><button class="password-toggle" type="button" data-password-target="f-pass" data-i18n="show_password" aria-label="${t('show_password')}">${t('show_password')}</button></div></div>
+      <div class="field"><label>${stu?t('new_pw'):t('password')}${stu?'':' *'}</label><div class="password-input-wrap"><input id="f-pass" type="password" class="input" placeholder="${stu?'••••••':''}" autocomplete="new-password" minlength="6" ${stu?'':'required'}><button class="password-toggle" type="button" data-password-target="f-pass" data-i18n="show_password" aria-label="${t('show_password')}">${t('show_password')}</button></div></div>
       <div class="field"><label>${t('dept')}</label><select id="f-dept" class="input">${Object.keys(DEPTS).map(k=>`<option value="${k}" ${stu&&stu.dept===k?'selected':''}>${esc(DEPTS[k][Vis.lang])}</option>`).join('')}</select></div>
       <div class="field"><label>${t('stage')}</label><select id="f-stage" class="input">${stu&&Number(stu.stage)>5?`<option value="${esc(String(stu.stage))}" selected disabled>${t('existing_stage')}: ${esc(String(stu.stage))}</option>`:''}${Array.from({length:5},(_,i)=>i+1).map(n=>`<option value="${n}" ${stu&&Number(stu.stage)===n?'selected':''}>${t('stage')} ${n}</option>`).join('')}</select></div>
       <div class="field"><label>${t('class_name')}</label><input id="f-class" class="input" maxlength="120" value="${esc(stu?.className||'')}"></div>
@@ -346,11 +331,6 @@ function vStudents(){
       <div class="field"><label>${t('phone_l')}${stu?'':' *'}</label><input id="f-phone" type="tel" class="input" value="${esc(stu?.phone||'')}" ${stu?'':'pattern="\\+[1-9][0-9]{7,14}" required'}></div>
       <div class="field"><label>${t('dob')}</label><input id="f-dob" type="date" class="input" value="${esc(stu?.dob||'')}"></div>
       <div class="field"><label>${t('email')}</label><input id="f-email" class="input" value="${esc(stu?.email||'')}"></div>
-    </div>
-    <div class="form-grid">
-      <label class="check"><input type="checkbox" id="f-email-opt-in" ${stu?.emailOptIn?'checked':''}> ${t('email_alert_consent')}</label>
-      <label class="check"><input type="checkbox" id="f-sms-opt-in" ${stu?.smsOptIn?'checked':''}> ${t('sms_alert_consent')}</label>
-      <label class="check"><input type="checkbox" id="f-whatsapp-opt-in" ${stu?.whatsappOptIn?'checked':''}> ${t('whatsapp_alert_consent')}</label>
     </div>
     <label class="grade-label" style="font-weight:700;font-size:.86rem;display:block;margin-bottom:10px">${t('grades')}</label>
     <div id="grade-rows">${gradeRowsHtml(stu?.grades)}</div>
@@ -374,25 +354,12 @@ function vStudents(){
       </div>`;
     }
   }
-  return pendingSignupsPanel()+form+attPanel+accessRequestsPanel()+`<div class="panel">
+  return form+attPanel+accessRequestsPanel()+`<div class="panel">
     <div class="search-row">
       <input id="stu-search" class="input" placeholder="${t('search_ph')}" value="${esc(stuQ)}">
       <button class="btn btn-navy" id="stu-add">＋ ${t('add_student')}</button>
     </div>
     ${stuTable(list,false)}
-  </div>`;
-}
-function pendingSignupsPanel(){
-  if(!['owner','admin'].includes(sess.role)||Store.mode!=='supabase')return '';
-  const signups=Store.data.pendingSignups||[];
-  return `<div class="panel"><div class="search-row"><h3 style="margin:0">${t('signup_pending_list')}</h3><span style="flex:1"></span>
-    <button class="btn btn-ghost btn-sm" id="signup-refresh">${t('signup_refresh')}</button></div>
-    ${signups.length?`<div class="table-wrap"><table><thead><tr><th>${t('student_full_name')}</th><th>${t('username')}</th><th>${t('phone_required')}</th><th>${t('email_optional')}</th><th>${t('dept')}</th><th>${t('stage')}</th><th>${t('actions')}</th></tr></thead><tbody>
-      ${signups.map(signup=>`<tr><td>${esc(signup.candidate.name||'')}</td><td>${esc(signup.username)}</td><td>${esc(signup.phone)}</td><td>${esc(signup.candidate.email||'—')}</td><td>${esc(deptLabel(signup.candidate.dept))}</td><td>${esc(String(signup.candidate.stage))}</td><td><div class="row-actions">
-        <button class="btn btn-gold btn-sm" data-signup-action="approve" data-signup-phone="${esc(signup.phone)}">${t('signup_approve')}</button>
-        <button class="btn btn-danger btn-sm" data-signup-action="reject" data-signup-phone="${esc(signup.phone)}">${t('signup_reject')}</button>
-      </div></td></tr>`).join('')}
-    </tbody></table></div>`:`<p class="muted">${t('signup_no_pending')}</p>`}
   </div>`;
 }
 function vAttendance(){
@@ -427,26 +394,6 @@ function wireStudents(){
     stuQ=si.value;const pos=si.selectionStart;render();
     const n=document.getElementById('stu-search');n.focus();n.setSelectionRange(pos,pos);
   });
-  const refresh=document.getElementById('signup-refresh');
-  if(refresh)refresh.onclick=async()=>{try{await refreshPendingSignups();render();}catch(error){console.error('Could not load pending student applications:',error);toast(t('signup_admin_error'),false);}};
-  document.querySelectorAll('[data-signup-action]').forEach(button=>{
-    button.onclick=async()=>{
-      button.disabled=true;
-      try{
-        const {data,error}=await Store.supabase.functions.invoke('manage-student-signup',{body:{action:button.dataset.signupAction,phone:button.dataset.signupPhone}});
-        if(error)throw new Error(data?.error||error.message);
-        await refreshPendingSignups();
-        toast(t(button.dataset.signupAction==='approve'?'signup_approved':'signup_rejected'));
-        render();
-      }catch(error){console.error('Could not update pending student application:',error);toast(t('signup_admin_error'),false);button.disabled=false;}
-    };
-  });
-}
-async function refreshPendingSignups(){
-  if(!['owner','admin'].includes(sess.role)||Store.mode!=='supabase')return;
-  const {data,error}=await Store.supabase.functions.invoke('manage-student-signup',{body:{action:'list'}});
-  if(error)throw new Error(data?.error||error.message);
-  Store.data.pendingSignups=data.signups||[];
 }
 async function saveStudent(){
   const d=Store.data;
@@ -454,6 +401,7 @@ async function saveStudent(){
   if(stu&&!canManageStudent(stu)){toast(t('shared_read_only'),false);return;}
   const name_en=val('f-name-en'),name_ku=val('f-name-ku'),user=val('f-user').toLowerCase().replace(/\s+/g,''),pass=document.getElementById('f-pass').value;
   if(!name_en||!user||(!stu&&!pass)){toast(t('err_fill'),false);return;}
+  if(pass&&pass.length<6){toast(t('pw_short'),false);return;}
   if(!stu&&(d.students.some(x=>x.username.toLowerCase()===user)||d.admins.some(a=>(a.username||'').toLowerCase()===user))){toast(t('username_taken'),false);return;}
   const grades=[...document.querySelectorAll('#grade-rows .grade-row')].map(r=>({
     subject:r.querySelector('.g-sub').value.trim(),
@@ -462,26 +410,14 @@ async function saveStudent(){
   const stage=Number(val('f-stage'));
   if((stage<1||stage>5)&&!(stu&&stage===Number(stu.stage))){toast(t('err_fill'),false);return;}
   const phone=val('f-phone').replace(/[ ()-]/g,'');
-  if(!stu&&!/^\+[1-9]\d{7,14}$/.test(phone)){toast(t('err_fill'),false);return;}
   const data={name_en,name_ku,dept:val('f-dept'),stage,className:val('f-class'),phone,email:val('f-email'),
-    emailOptIn:document.getElementById('f-email-opt-in').checked,smsOptIn:document.getElementById('f-sms-opt-in').checked,
-    whatsappOptIn:document.getElementById('f-whatsapp-opt-in').checked,
     dob:val('f-dob'),grades,...(sess.role==='teacher'?{}:{teacherId:val('f-teacher')||sess.id})};
   if(stu){
     Object.assign(stu,data);
-    if(pass){
-      if(Store.mode==='supabase'){toast(t('reset_hint'),false);return;}
-      stu.pass=await hashPass(pass);
-    }
+    if(pass)stu.pass=await hashPass(pass);
     await Store.setDoc('students',stu);
   }else{
-    let id=uid('s'),authEmail='';
-    if(Store.mode==='supabase'){
-      const res=await Auth.createAuthAccount(synEmail(user),pass,'student');
-      if(!res.ok){toast(t('username_taken'),false);return;}
-      id=res.uid;authEmail=synEmail(user);
-    }
-    const ns={id,username:user,pass:Store.mode==='supabase'?'':await hashPass(pass),authEmail,teacherId:sess.id,sharedWith:[],attendance:100,attMap:{},...data};
+    const ns={id:uid('s'),username:user,pass:await hashPass(pass),teacherId:sess.id,sharedWith:[],attendance:100,attMap:{},...data};
     await Store.setDoc('students',ns);
   }
   showStuForm=false;stuEditId=null;toast(t('saved_ok'));render();
@@ -502,14 +438,6 @@ function accessRequestsPanel(){
 }
 async function requestStudentAccess(){
   const username=document.getElementById('share-username').value.trim().toLowerCase();
-  if(Store.mode==='supabase'){
-    try{
-      const result=await Store.functions.httpsCallable('request-student-access')({username});
-      Store.data.accessRequests.push({id:result.data.id,...result.data.request});
-      toast(t('request_sent'));render();
-    }catch(err){toast(t('student_not_found'),false);}
-    return;
-  }
   const student=Store.data.students.find(s=>s.username.toLowerCase()===username);
   if(!student||!student.teacherId||student.teacherId===sess.id){toast(t('student_not_found'),false);return;}
   if(Store.data.accessRequests.some(r=>r.studentId===student.id&&r.requesterId===sess.id&&r.status==='pending')){toast(t('request_pending'),false);return;}
@@ -701,7 +629,7 @@ function wireGallery(){
   if(!fi)return;
   fi.addEventListener('change',()=>{
     const f=fi.files[0];if(!f)return;
-    if(f.size>900*1024&&Store.mode==='local'){toast(t('drop_hint'),false);return;}
+    if(f.size>900*1024){toast(t('drop_hint'),false);return;}
     const r=new FileReader();
     r.onload=()=>{galTmp=r.result;document.getElementById('gal-preview').innerHTML=`<img src="${galTmp}" style="max-width:260px;border-radius:12px">`;};
     r.readAsDataURL(f);
@@ -710,15 +638,7 @@ function wireGallery(){
 async function saveGallery(){
   if(!galTmp){toast(t('err_fill'),false);return;}
   const id=uid('g');
-  let url=galTmp;
-  if(Store.mode==='supabase'){
-    try{
-      const ref=Store.storage.ref('gallery/'+id+'.jpg');
-      await ref.putString(galTmp,'data_url');
-      url=await ref.getDownloadURL();
-    }catch(e){toast(t('pdf_fail'),false);return;}
-  }
-  await Store.setDoc('gallery',{id,url,caption_en:val('gal-cap-en'),caption_ku:val('gal-cap-ku'),date:new Date().toISOString().slice(0,10)});
+  await Store.setDoc('gallery',{id,url:galTmp,caption_en:val('gal-cap-en'),caption_ku:val('gal-cap-ku'),date:new Date().toISOString().slice(0,10)});
   galTmp=null;showGalForm=false;toast(t('saved_ok'));render();
 }
 
@@ -795,7 +715,7 @@ function vCerts(){
     </tbody></table></div></div>`;
 }
 
-/* ---------- site content & socials ---------- */
+/* ---------- website content ---------- */
 function vContent(){
   const s=Store.data.settings;
   const setting=(field,key,language=Vis.lang)=>esc(s[field]||(language==='ku'?I18N.ku[key]:I18N.en[key])||'');
@@ -832,16 +752,8 @@ function vContent(){
     <div class="field"><label>${t('email')}</label><input id="c-email" class="input" value="${esc(s.email)}"></div>
     <div class="field"><label>${t('office_hours_en')}</label><input id="c-hours-en" class="input" value="${esc(s.officeHours_en||'')}"></div>
     <div class="field"><label>${t('office_hours_ku')}</label><input id="c-hours-ku" class="input" dir="rtl" value="${esc(s.officeHours_ku||'')}"></div>
-    <div class="field"><label>${t('analytics_id')}</label><input id="c-analytics-id" class="input" dir="ltr" maxlength="32" placeholder="G-XXXXXXXXXX" value="${esc(s.analyticsId||'')}"><small class="muted">${t('analytics_consent_note')}</small></div>
   </div>
   <button class="btn btn-gold" id="c-save">${t('save')}</button></div>`;
-}
-function vSocials(){
-  const so=Store.data.settings.socials||{};
-  const row=k=>`<div class="field"><label style="text-transform:capitalize">${k}</label><input id="s-${k}" class="input" dir="ltr" placeholder="https://…" value="${esc(so[k]||'')}"></div>`;
-  return `<div class="panel"><h3>${t('socials')}</h3><p class="muted" style="margin-bottom:16px;font-size:.9rem">${t('soc_hint')}</p>
-  <div class="form-grid">${['facebook','instagram','youtube','telegram','whatsapp'].map(row).join('')}</div>
-  <button class="btn btn-gold" id="s-save">${t('save')}</button></div>`;
 }
 
 /* ---------- staff accounts (owner only) ---------- */
@@ -877,16 +789,8 @@ async function saveStaff(){
   if(!['teacher','admin','content_editor'].includes(role)){toast(t('err_fill'),false);return;}
   if(d.admins.some(a=>(a.username||'').toLowerCase()===username||(a.email||'').toLowerCase()===username)
     ||d.students.some(s=>(s.username||'').toLowerCase()===username)){toast(t('username_taken'),false);return;}
-  const email=synEmail(username);
-  let id=uid('a');
-  if(Store.mode==='supabase'){
-    const res=await Auth.createAuthAccount(email,pass,role);
-    if(!res.ok){toast(res.error||t('username_taken'),false);return;}
-    id=res.uid;
-  }else{
-    await Store.setDoc('admins',{id,email,username,pass:await hashPass(pass),name,role});toast(t('saved_ok'));render();return;
-  }
-  await Store.setDoc('admins',{id,email,username,pass:'',name,role});
+  const email=`${username}@local.invalid`;
+  await Store.setDoc('admins',{id:uid('a'),email,username,pass:await hashPass(pass),name,role});
   toast(t('saved_ok'));render();
 }
 
@@ -905,12 +809,8 @@ async function changePw(){
   const a=Store.data.admins.find(x=>x.id===sess.id);if(!a)return;
   const cur=val('pw-cur'),np=val('pw-new');
   if(np.length<6){toast(t('pw_short'),false);return;}
-  if(Store.mode==='supabase'){
-    try{await Auth.changePassword(a.email,cur,np);}catch(e){toast(t('wrong_current'),false);return;}
-  }else{
-    if(a.pass!==await hashPass(cur)){toast(t('wrong_current'),false);return;}
-    a.pass=await hashPass(np);await Store.setDoc('admins',a);
-  }
+  if(a.pass!==await hashPass(cur)){toast(t('wrong_current'),false);return;}
+  a.pass=await hashPass(np);await Store.setDoc('admins',a);
   toast(t('pw_changed'));render();
 }
 
@@ -964,7 +864,6 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
         await Store.del('resources',resource.id);
         toast(t('deleted_ok'));render();
       });
-      document.getElementById('tab-content').addEventListener('change',VisExtended.handleAdminChange);
     }
     return;
   }
@@ -996,19 +895,8 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('[data-sedit]')){stuEditId=b.dataset.sedit;showStuForm=true;render();window.scrollTo({top:0,behavior:'smooth'});return;}
   if(b=q('[data-srpw]')){
     const stu=Store.data.students.find(x=>x.id===b.dataset.srpw);if(!stu)return;
-    if(Store.mode==='supabase'){
-      if(stu.email&&/.+@.+\..+/.test(stu.email)){
-        try{
-          await Store.functions.httpsCallable('send-student-password-reset')({
-            studentId:stu.id,redirectTo:new URL('login.html?reset=1',location.href).href
-          });
-          toast(t('msg_sent'));
-        }catch(error){toast(error.message||t('reset_hint'),false);}
-      }else toast(t('reset_hint'),false);
-    }else{
-      const p=prompt(t('new_pw'));
-      if(p&&p.length>=6){stu.pass=await hashPass(p);await Store.setDoc('students',stu);toast(t('pw_changed'));}
-    }
+    const password=prompt(t('new_pw'));
+    if(password&&password.length>=6){stu.pass=await hashPass(password);await Store.setDoc('students',stu);toast(t('pw_changed'));}
     return;
   }
   if(b=q('[data-satt]')){stuAttId=b.dataset.satt;showStuForm=false;const d2=new Date();attView={y:d2.getFullYear(),m:d2.getMonth()};render();return;}
@@ -1074,9 +962,8 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('#ex-stu')){exportStudents();return;}
   if(b=q('#ex-gra')){exportGrades();return;}
   if(b=q('#ex-att')){exportAtt();return;}
-  if(b=q('#ex-msg')||q('#ex-msg2')){exportMsgs();return;}
+  if(b=q('#ex-msg')||q('#ex-msg2')){exportMsgs();return;  }
   if(b=q('#c-save')){
-    if(val('c-analytics-id')&&!/^G-[A-Z0-9]+$/i.test(val('c-analytics-id'))){toast('Enter a valid Google Analytics measurement ID (G-XXXXXXXXXX).',false);return;}
     const siteText={siteName_en:val('c-site-name-en'),siteName_ku:val('c-site-name-ku'),since:val('c-since'),
       whyTitle_en:val('c-why-title-en'),whyTitle_ku:val('c-why-title-ku'),faqTitle_en:val('c-faq-title-en'),faqTitle_ku:val('c-faq-title-ku')};
     [1,2,3,4].forEach(number=>{
@@ -1089,34 +976,15 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
       heroSub_en:document.getElementById('c-sub-en').value.trim(),heroSub_ku:document.getElementById('c-sub-ku').value.trim(),
       about_en:document.getElementById('c-about-en').value.trim(),about_ku:document.getElementById('c-about-ku').value.trim(),
       address_en:val('c-addr-en'),address_ku:val('c-addr-ku'),phone:val('c-phone'),email:val('c-email'),
-      officeHours_en:val('c-hours-en'),officeHours_ku:val('c-hours-ku'),
-      analyticsId:val('c-analytics-id')});
-    toast(t('saved_ok'));return;
-  }
-  if(b=q('#s-save')){
-    const so={...(Store.data.settings.socials||{})};
-    ['facebook','instagram','youtube','telegram','whatsapp'].forEach(k=>{so[k]=document.getElementById('s-'+k).value.trim();});
-    if(so.whatsapp&&!whatsappHref(so.whatsapp)){toast(t('whatsapp_link_invalid'),false);return;}
-    await Store.saveSettings({socials:so});
+      officeHours_en:val('c-hours-en'),officeHours_ku:val('c-hours-ku')});
     toast(t('saved_ok'));return;
   }
   if(b=q('#a-add')){await runManagerSave(saveStaff);return;}
   if(b=q('#acct-save')){await changePw();return;}
 });
-document.getElementById('tab-content').addEventListener('submit',async e=>{
-  if(e.target.id!=='ai-form')return;
-  e.preventDefault();
-  const button=e.target.querySelector('button[type="submit"],button:not([type])');
-  const answer=document.getElementById('ai-answer');
-  answer.textContent='…';if(button)button.disabled=true;
-  try{answer.textContent=await askAI(document.getElementById('ai-question').value);}
-  catch(err){answer.textContent=err.message||t('ai_error');}
-  if(button)button.disabled=false;
-});
-
-boot(async()=>{
-  document.getElementById('mode-badge').textContent=Store.mode==='supabase'?('☁️ '+t('mode_supabase')):('💻 '+t('mode_demo'));
-  try{await refreshPendingSignups();}catch(error){console.error('Could not load pending student applications:',error);toast(t('signup_admin_error'),false);}
+document.getElementById('tab-content').addEventListener('change',VisExtended.handleAdminChange);
+boot(()=>{
+  document.getElementById('mode-badge').textContent='💻 '+t('mode_demo');
   render();
 });
 }

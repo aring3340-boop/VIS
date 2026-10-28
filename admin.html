@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; connect-src 'self' data: blob:; img-src 'self' data: blob:; font-src 'self' data: blob:; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:">
 <title>Admin Panel · VIS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -16,7 +15,6 @@
     <button class="side-link" data-tab="dash"><span class="ic">📊</span><span data-i18n="dash"></span></button>
     <button class="side-link" data-tab="students"><span class="ic">🎓</span><span data-i18n="students"></span></button>
     <button class="side-link" data-tab="attendance"><span class="ic">📅</span><span data-i18n="attendance_admin"></span></button>
-    <button class="side-link" data-tab="ai"><span class="ic">✦</span><span data-i18n="ai_helper"></span></button>
     <button class="side-link" data-tab="schedule"><span class="ic">🗓️</span><span data-i18n="schedule"></span></button>
     <button class="side-link" data-tab="exam-results"><span class="ic">🧾</span><span data-i18n="exam_results"></span></button>
     <button class="side-link" data-tab="backup"><span class="ic">💾</span><span data-i18n="backup_restore"></span></button>
@@ -44,7 +42,6 @@
   </main>
 </div>
 <div id="toast"></div>
-<script src="js/supabase-config.js"></script>
 <script src="js/db.js"></script>
 <script src="js/common.js"></script>
 <script src="js/auth.js"></script>

@@ -1,10 +1,14 @@
-const CACHE_NAME = 'vis-shell-v8';
+const CACHE_NAME = 'vis-shell-v12';
 const APP_SHELL = [
   './',
   './index.html',
   './login.html',
+  './admin.html',
+  './student.html',
+  './teacher.html',
+  './program.html',
+  './verify.html',
   './css/styles.css',
-  './js/supabase-config.js',
   './js/db.js',
   './js/common.js',
   './js/extended.js',
@@ -13,6 +17,10 @@ const APP_SHELL = [
   './js/pwa.js',
   './js/auth.js',
   './js/login.js',
+  './js/admin.js',
+  './js/student.js',
+  './js/teacher.js',
+  './js/verify.js',
   './assets/institute-logo.jpg',
   './manifest.webmanifest',
 ];
@@ -34,29 +42,14 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
   if (request.mode === 'navigate') {
-    const shellPage = ['index.html', 'login.html'].includes(url.pathname.split('/').pop());
-    if (!shellPage) {
-      event.respondWith(fetch(request));
-      return;
-    }
     event.respondWith(fetch(request).then(response => {
       if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
       return response;
     }).catch(async () => (await caches.match(request)) || (await caches.match('./index.html'))));
     return;
   }
-  if (/\.(?:js|css)$/.test(url.pathname)) {
-    event.respondWith(fetch(request, { cache: 'no-cache' }).then(response => {
-      if (response.ok) {
-        caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
-      }
-      return response;
-    }).catch(async () => {
-      const cached = await caches.match(request);
-      if (cached) return cached;
-      throw new Error(`No cached asset available for ${request.url}`);
-    }));
-    return;
-  }
-  event.respondWith(caches.match(request).then(cached => cached || fetch(request)));
+  event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
+    if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+    return response;
+  })));
 });

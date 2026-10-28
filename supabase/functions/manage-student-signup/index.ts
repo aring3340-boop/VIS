@@ -39,6 +39,7 @@ Deno.serve(async (request) => {
           name_ku: "",
           dept: String(candidate.dept),
           stage: Number(candidate.stage),
+          age: Number(candidate.age) || null,
           className: "",
           phone: signup.phone,
           email: String(candidate.email || ""),

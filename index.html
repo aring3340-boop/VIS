@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; connect-src 'self' data: blob:; img-src 'self' data: blob:; font-src 'self' data: blob:; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:">
 <meta name="description" content="Discover professional vocational programs, institute news and student resources at the Vocational Institute of Sulaimanyah.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Vocational Institute of Sulaimanyah">
@@ -12,8 +13,6 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#10243b">
 <link rel="apple-touch-icon" href="assets/institute-logo.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="public-site">
@@ -155,8 +154,6 @@
     <div class="contact-grid" style="margin-top:30px">
       <div>
         <p class="lead" data-i18n="contact_lead"></p>
-        <div class="socials" id="socials-row"></div>
-        <a class="btn btn-whatsapp" id="whatsapp-contact" href="#" target="_blank" rel="noopener noreferrer" hidden data-i18n="whatsapp_chat"></a>
       </div>
       <div class="card">
         <div class="info-item" id="office-hours-item" hidden><span class="ic">🕘</span><div><b data-i18n="office_hours"></b><p class="muted" id="c-office-hours"></p></div></div>
@@ -204,14 +201,8 @@
     <div class="footer-bottom">© <span id="year"></span> <span id="site-name-b"></span> · VIS</div>
   </div>
 </footer>
-<aside id="analytics-consent" class="analytics-consent" hidden>
-  <p data-i18n="analytics_consent_note"></p>
-  <button class="btn btn-ghost btn-sm" id="analytics-reject" data-i18n="reject"></button>
-  <button class="btn btn-gold btn-sm" id="analytics-accept" data-i18n="accept"></button>
-</aside>
 
 <div id="toast"></div>
-<script src="js/supabase-config.js"></script>
 <script src="js/db.js"></script>
 <script src="js/common.js"></script>
 <script src="js/extended.js"></script>
@@ -238,8 +229,6 @@ renderPublic=function(){_origRender();
   setText('f-phone',s.phone);setText('f-email',s.email);
 };
 boot(renderPublic);
-document.getElementById('analytics-accept').onclick=()=>{localStorage.setItem('vis_analytics_consent','accepted');document.getElementById('analytics-consent').hidden=true;renderPublic();};
-document.getElementById('analytics-reject').onclick=()=>{localStorage.setItem('vis_analytics_consent','rejected');document.getElementById('analytics-consent').hidden=true;};
 </script>
 <script src="js/pwa.js"></script>
 </body>

@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; connect-src 'self' data: blob:; img-src 'self' data: blob:; font-src 'self' data: blob:; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:">
 <title>Student Panel · VIS</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div class="dash-hero">
@@ -91,16 +89,9 @@
     <h3 data-i18n="announcements"></h3>
     <div id="ann-list"></div>
   </div>
-  <div class="card col-12">
-    <h3 data-i18n="ai_helper"></h3>
-    <form id="ai-form"><div class="field"><textarea id="ai-question" class="input" required maxlength="2000" data-i18n-ph="ai_placeholder"></textarea></div>
-      <button class="btn btn-gold" data-i18n="ai_ask"></button></form>
-    <div id="ai-answer" class="muted" style="white-space:pre-wrap;margin-top:14px"></div>
-  </div>
 </div>
 
 <div id="toast"></div>
-<script src="js/supabase-config.js"></script>
 <script src="js/db.js"></script>
 <script src="js/common.js"></script>
 <script src="js/auth.js"></script>

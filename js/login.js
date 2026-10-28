@@ -49,6 +49,7 @@ document.getElementById('signup-resend').onclick=async()=>{
   const button=document.getElementById('signup-resend');
   button.disabled=true;
   try{
+    const ageValue = Number(document.getElementById('signup-age').value);
     const {data,error}=await Store.supabase.functions.invoke('student-signup',{body:{
       action:'send-code',
       phone:document.getElementById('signup-phone').value.replace(/[ ()-]/g,''),
@@ -58,6 +59,7 @@ document.getElementById('signup-resend').onclick=async()=>{
       email:document.getElementById('signup-email').value.trim(),
       dept:document.getElementById('signup-dept').value,
       stage:Number(document.getElementById('signup-stage').value),
+      age: Number.isFinite(ageValue) ? ageValue : null,
       consent:document.getElementById('signup-consent').checked
     }});
     if(error)throw new Error(data?.error||error.message);
@@ -70,6 +72,7 @@ signupForm.addEventListener('submit',async event=>{
   event.preventDefault();hideErr();
   const phone=document.getElementById('signup-phone').value.replace(/[ ()-]/g,'');
   const password=document.getElementById('signup-password').value;
+  const ageValue = Number(document.getElementById('signup-age').value);
   const payload={
     phone,
     password,
@@ -80,6 +83,7 @@ signupForm.addEventListener('submit',async event=>{
       email:document.getElementById('signup-email').value.trim(),
       dept:document.getElementById('signup-dept').value,
       stage:Number(document.getElementById('signup-stage').value),
+      age: Number.isFinite(ageValue) ? ageValue : null,
       consent:document.getElementById('signup-consent').checked
     })
   };
@@ -91,7 +95,7 @@ signupForm.addEventListener('submit',async event=>{
     if(error)throw new Error(data?.error||error.message);
     if(!signupCodeSent){
       signupCodeSent=true;
-      ['signup-name','signup-username','signup-phone','signup-email','signup-dept','signup-stage','signup-consent'].forEach(id=>{
+      ['signup-name','signup-username','signup-phone','signup-email','signup-dept','signup-stage','signup-age','signup-consent'].forEach(id=>{
         document.getElementById(id).disabled=true;
       });
       document.getElementById('signup-code-field').hidden=false;

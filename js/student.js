@@ -36,8 +36,7 @@ function renderAssignments(stu){
 function renderMaterials(stu){
   const items=Store.data.materials.filter(m=>(m.dept==='all'||m.dept===stu.dept)&&(!Number(m.stage)||Number(m.stage)===Number(stu.stage)));
   document.getElementById('materials-list').innerHTML=items.map(m=>`<div class="announce"><b>${esc(m.title)}</b> · ${esc(m.course)}
-    ${m.body?`<p class="muted" style="white-space:pre-wrap">${esc(m.body)}</p>`:''}
-    ${m.url?`<a class="btn btn-ghost btn-sm" href="${esc(m.url)}" target="_blank" rel="noopener">${t('resource')}</a>`:''}</div>`).join('')||`<p class="muted">${t('no_materials')}</p>`;
+    ${m.body?`<p class="muted" style="white-space:pre-wrap">${esc(m.body)}</p>`:''}</div>`).join('')||`<p class="muted">${t('no_materials')}</p>`;
 }
 function renderPrivateResources(){
   const resources=[...Store.data.resources].sort((a,b)=>String(a.title_en||'').localeCompare(String(b.title_en||'')));
@@ -130,14 +129,6 @@ document.getElementById('student-resources-list').addEventListener('click',async
   try{await Store.downloadResourceFile(resource);}
   catch(error){console.error('Could not download private student resource:',error);toast(t('resource_download_error'),false);}
   finally{button.disabled=false;}
-});
-document.getElementById('ai-form').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const button=e.target.querySelector('button'),answer=document.getElementById('ai-answer');
-  button.disabled=true;answer.textContent='…';
-  try{answer.textContent=await askAI(document.getElementById('ai-question').value);}
-  catch(err){answer.textContent=err.message||t('ai_error');}
-  button.disabled=false;
 });
 document.getElementById('assignments-list').addEventListener('submit',async e=>{
   const form=e.target.closest('[data-assignment-submit]');if(!form)return;
