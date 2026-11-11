@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vis-shell-v15';
+const CACHE_NAME = 'vis-shell-v16';
 const APP_SHELL = [
   './',
   './index.html',
@@ -47,6 +47,13 @@ self.addEventListener('fetch', event => {
       if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
       return response;
     }).catch(async () => (await caches.match(request)) || (await caches.match('./index.html'))));
+    return;
+  }
+  if (request.destination === 'script') {
+    event.respondWith(fetch(request, {cache: 'no-cache'}).then(response => {
+      if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+      return response;
+    }).catch(async () => (await caches.match(request))));
     return;
   }
   event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
