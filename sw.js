@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vis-shell-v12';
+const CACHE_NAME = 'vis-shell-v14';
 const APP_SHELL = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const APP_SHELL = [
   './verify.html',
   './css/styles.css',
   './js/db.js',
+  './js/supabase-config.js',
   './js/common.js',
   './js/extended.js',
   './js/public.js',

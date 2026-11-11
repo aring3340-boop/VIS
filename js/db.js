@@ -191,6 +191,10 @@ async function defaultData(){
 const Store={
   mode:'local',data:null,db:null,auth:null,storage:null,functions:null,supabase:null,legacyPublicResources:false,
   async init(){
+    if(typeof supabaseConfigured!=='function'){
+      console.warn('Supabase configuration is unavailable; using local browser data.');
+      this.mode='local';await this.localInit();return;
+    }
     if(supabaseConfigured()){
       await loadSupabaseSDK();
       this.supabase=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey,{global:{fetch:supabaseFetchWithTimeout}});
