@@ -2,6 +2,12 @@ name: Deploy Supabase backend
 
 on:
   workflow_dispatch:
+    inputs:
+      apply_migrations:
+        description: Apply pending database migrations (requires SUPABASE_DB_PASSWORD)
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -20,13 +26,22 @@ jobs:
           version: latest
       - name: Require Supabase deployment secrets
         run: |
-          if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$SUPABASE_DB_PASSWORD" ]; then
-            echo "::error::Add SUPABASE_ACCESS_TOKEN and SUPABASE_DB_PASSWORD as GitHub Actions repository secrets."
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::error::Add SUPABASE_ACCESS_TOKEN as a GitHub Actions repository secret."
             exit 1
           fi
-      - name: Link Supabase project
+      - name: Require database password for migrations
+        if: ${{ inputs.apply_migrations }}
+        run: |
+          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
+            echo "::error::Add SUPABASE_DB_PASSWORD as a GitHub Actions repository secret to apply migrations."
+            exit 1
+          fi
+      - name: Link Supabase project for migrations
+        if: ${{ inputs.apply_migrations }}
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
       - name: Apply database migrations
+        if: ${{ inputs.apply_migrations }}
         run: supabase db push --yes
       - name: Deploy Edge Functions
         run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"

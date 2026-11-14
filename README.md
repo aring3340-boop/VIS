@@ -9,7 +9,7 @@ The static website is deployed with GitHub Pages at <https://aring3340-boop.gith
 The live website and its cloud services are separate:
 
 1. Use the active Supabase project and its publishable/anon key in `js/supabase-config.js`. Do not use a service-role key in the browser.
-2. Deploy the database migrations and Edge Functions. For the GitHub Actions workflow, first add `SUPABASE_ACCESS_TOKEN` (from Supabase account access tokens) and `SUPABASE_DB_PASSWORD` as repository secrets under **Settings → Secrets and variables → Actions**. Then run **Actions → Deploy Supabase backend → Run workflow**. Alternatively, install and authenticate the Supabase CLI and run:
+2. Deploy the Edge Functions. For the GitHub Actions workflow, add `SUPABASE_ACCESS_TOKEN` (from Supabase account access tokens) as a repository secret under **Settings → Secrets and variables → Actions**, then run **Actions → Deploy Supabase backend → Run workflow**. The workflow skips database migrations by default because they have already been applied; select **apply_migrations** only when needed, and add `SUPABASE_DB_PASSWORD` as a repository secret first. Alternatively, install and authenticate the Supabase CLI and run:
 
    ```text
    supabase login
