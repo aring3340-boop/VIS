@@ -18,6 +18,27 @@ document.getElementById('tab-staff').onclick=()=>switchTab('staff');
 let signupCodeSent=false;
 let signupComplete=false;
 const signupForm=document.getElementById('signup-form');
+function signupDeliveryMessage(data){
+  const channels=Array.isArray(data?.sentChannels)?data.sentChannels:[];
+  if(channels.includes('sms')&&channels.includes('whatsapp'))return t('signup_code_sent');
+  if(channels.includes('sms'))return t('signup_code_sent_sms');
+  if(channels.includes('whatsapp'))return t('signup_code_sent_whatsapp');
+  return t('signup_code_sent');
+}
+async function sendSignupRequest(body){
+  const {data,error}=await Store.supabase.functions.invoke('student-signup',{body});
+  if(!error)return data;
+  let message=data?.error||error.message;
+  if(error.context instanceof Response){
+    try{
+      const details=await error.context.clone().json();
+      if(typeof details?.error==='string')message=details.error;
+    }catch(parseError){
+      if(!(parseError instanceof SyntaxError))throw parseError;
+    }
+  }
+  throw new Error(message);
+}
 function resetSignupForm(){
   signupForm.reset();
   signupCodeSent=false;
@@ -50,7 +71,7 @@ document.getElementById('signup-resend').onclick=async()=>{
   button.disabled=true;
   try{
     const ageValue = Number(document.getElementById('signup-age').value);
-    const {data,error}=await Store.supabase.functions.invoke('student-signup',{body:{
+    const data=await sendSignupRequest({
       action:'send-code',
       phone:document.getElementById('signup-phone').value.replace(/[ ()-]/g,''),
       password:document.getElementById('signup-password').value,
@@ -61,9 +82,8 @@ document.getElementById('signup-resend').onclick=async()=>{
       stage:Number(document.getElementById('signup-stage').value),
       age: Number.isFinite(ageValue) ? ageValue : null,
       consent:document.getElementById('signup-consent').checked
-    }});
-    if(error)throw new Error(data?.error||error.message);
-    document.getElementById('signup-status').textContent=t('signup_code_sent');
+    });
+    document.getElementById('signup-status').textContent=signupDeliveryMessage(data);
     document.getElementById('signup-status').hidden=false;
   }catch(error){showErr(error.message||t('signup_error'));}
   finally{button.disabled=false;}
@@ -91,8 +111,7 @@ signupForm.addEventListener('submit',async event=>{
   button.disabled=true;
   try{
     if(Store.mode!=='supabase')throw new Error(t('signup_cloud_required'));
-    const {data,error}=await Store.supabase.functions.invoke('student-signup',{body:payload});
-    if(error)throw new Error(data?.error||error.message);
+    const data=await sendSignupRequest(payload);
     if(!signupCodeSent){
       signupCodeSent=true;
       ['signup-name','signup-username','signup-phone','signup-email','signup-dept','signup-stage','signup-age','signup-consent'].forEach(id=>{
@@ -101,7 +120,7 @@ signupForm.addEventListener('submit',async event=>{
       document.getElementById('signup-code-field').hidden=false;
       document.getElementById('signup-code').required=true;
       button.textContent=t('signup_verify');
-      document.getElementById('signup-status').textContent=t('signup_code_sent');
+      document.getElementById('signup-status').textContent=signupDeliveryMessage(data);
       document.getElementById('signup-status').style.color='var(--green)';
       document.getElementById('signup-status').hidden=false;
       document.getElementById('signup-resend').hidden=false;

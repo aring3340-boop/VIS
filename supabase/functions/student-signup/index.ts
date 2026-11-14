@@ -81,11 +81,20 @@ Deno.serve(async (request) => {
         user_id: null,
       });
       if (saveError) throw saveError;
-      await Promise.all([
+      const deliveries = await Promise.allSettled([
         sendTwilioMessage(phone, `Your VIS verification code is ${code}. It expires in 10 minutes.`, "sms"),
         sendTwilioMessage(phone, code, "whatsapp", "otp"),
       ]);
-      return reply({ sent: true });
+      const sentChannels = deliveries.flatMap((delivery, index) =>
+        delivery.status === "fulfilled" ? [index === 0 ? "sms" : "whatsapp"] : []);
+      if (sentChannels.length === 0) {
+        const failures = deliveries.flatMap((delivery) =>
+          delivery.status === "rejected"
+            ? [delivery.reason instanceof Error ? delivery.reason.message : "Message delivery failed."]
+            : []);
+        return reply({ error: `Could not send the verification code. ${failures.join(" ")}` }, 503);
+      }
+      return reply({ sent: true, sentChannels });
     }
 
     if (action === "verify-code") {

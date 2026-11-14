@@ -32,5 +32,18 @@ export async function sendTwilioMessage(
     },
     body: new URLSearchParams(fields),
   });
-  if (!response.ok) throw new Error(`Twilio ${channel} delivery failed with status ${response.status}.`);
+  if (!response.ok) {
+    let providerMessage = "";
+    try {
+      const result = await response.json();
+      if (typeof result.message === "string") providerMessage = result.message;
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
+    }
+    throw new Error(
+      providerMessage
+        ? `Twilio ${channel} delivery failed: ${providerMessage}`
+        : `Twilio ${channel} delivery failed with status ${response.status}.`,
+    );
+  }
 }

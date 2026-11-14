@@ -19,7 +19,7 @@ The live website and its cloud services are separate:
    ```
 
 3. Configure the Edge Function secrets in Supabase, not in browser JavaScript or the repository: `SIGNUP_OTP_SECRET`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `TWILIO_WHATSAPP_FROM`, and the approved `TWILIO_WHATSAPP_OTP_TEMPLATE_SID` / `TWILIO_WHATSAPP_TEMPLATE_SID`. The SMS and WhatsApp channels require a configured Twilio account and may incur charges.
-4. In Supabase Auth URL settings, add the GitHub Pages URL as an allowed site/redirect URL. Test signup using a real phone you control, confirm both verification messages arrive, and verify that the application remains pending until approved by an administrator.
+4. In Supabase Auth URL settings, add the GitHub Pages URL as an allowed site/redirect URL. Test signup using a real phone you control, confirm the delivery channel reported by the site, and verify that the application remains pending until approved by an administrator.
 
 The GitHub Pages workflow publishes only the static website; it does not deploy database migrations or Edge Functions. Do not put a Supabase service-role key or Twilio credentials in `js/supabase-config.js`, GitHub Pages files, or any public commit. The website can be hosted free, but real SMS and WhatsApp delivery is not guaranteed to be free.
 
