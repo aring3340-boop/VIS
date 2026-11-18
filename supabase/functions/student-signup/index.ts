@@ -1,6 +1,8 @@
 import { preflight, reply, service } from "../_shared/http.ts";
 import { sendTwilioMessage } from "../_shared/twilio.ts";
 
+// Student signup verification is delivered through the configured SMS/WhatsApp channels.
+
 function normalizePhone(value: unknown) {
   return String(value || "").replace(/[ ()-]/g, "");
 }
