@@ -20,24 +20,50 @@ let signupComplete=false;
 const signupForm=document.getElementById('signup-form');
 function signupDeliveryMessage(data){
   const channels=Array.isArray(data?.sentChannels)?data.sentChannels:[];
-  if(channels.includes('sms')&&channels.includes('whatsapp'))return t('signup_code_sent');
-  if(channels.includes('sms'))return t('signup_code_sent_sms');
-  if(channels.includes('whatsapp'))return t('signup_code_sent_whatsapp');
-  return t('signup_code_sent');
+  const failed=Array.isArray(data?.failedChannels)?data.failedChannels:[];
+  let message=channels.includes('sms')&&channels.includes('whatsapp')
+    ?t('signup_code_sent')
+    :channels.includes('sms')
+      ?t('signup_code_sent_sms')
+      :channels.includes('whatsapp')
+        ?t('signup_code_sent_whatsapp')
+        :t('signup_code_sent');
+  if(failed.includes('whatsapp'))message+=` ${t('signup_whatsapp_failed')}`;
+  if(failed.includes('sms'))message+=` ${t('signup_sms_failed')}`;
+  return message;
+}
+function showSignupCodeStep(message,isError=false){
+  signupCodeSent=true;
+  ['signup-name','signup-username','signup-phone','signup-email','signup-dept','signup-stage','signup-age','signup-consent'].forEach(id=>{
+    document.getElementById(id).disabled=true;
+  });
+  document.getElementById('signup-code-field').hidden=false;
+  document.getElementById('signup-code').required=true;
+  const button=document.getElementById('signup-submit');
+  button.textContent=t('signup_verify');
+  const status=document.getElementById('signup-status');
+  status.textContent=message;
+  status.style.color=isError?'var(--red)':'var(--green)';
+  status.hidden=false;
+  document.getElementById('signup-resend').hidden=false;
 }
 async function sendSignupRequest(body){
   const {data,error}=await Store.supabase.functions.invoke('student-signup',{body});
   if(!error)return data;
   let message=data?.error||error.message;
+  let codeCreated=false;
   if(error.context instanceof Response){
     try{
       const details=await error.context.clone().json();
       if(typeof details?.error==='string')message=details.error;
+      codeCreated=details?.codeCreated===true;
     }catch(parseError){
       if(!(parseError instanceof SyntaxError))throw parseError;
     }
   }
-  throw new Error(message);
+  const requestError=new Error(message);
+  requestError.codeCreated=codeCreated;
+  throw requestError;
 }
 function resetSignupForm(){
   signupForm.reset();
@@ -112,17 +138,7 @@ signupForm.addEventListener('submit',async event=>{
   try{
     const data=await sendSignupRequest(payload);
     if(!signupCodeSent){
-      signupCodeSent=true;
-      ['signup-name','signup-username','signup-phone','signup-email','signup-dept','signup-stage','signup-age','signup-consent'].forEach(id=>{
-        document.getElementById(id).disabled=true;
-      });
-      document.getElementById('signup-code-field').hidden=false;
-      document.getElementById('signup-code').required=true;
-      button.textContent=t('signup_verify');
-      document.getElementById('signup-status').textContent=signupDeliveryMessage(data);
-      document.getElementById('signup-status').style.color='var(--green)';
-      document.getElementById('signup-status').hidden=false;
-      document.getElementById('signup-resend').hidden=false;
+      showSignupCodeStep(signupDeliveryMessage(data));
       return;
     }
     document.getElementById('signup-status').textContent=t('signup_pending');
@@ -130,7 +146,10 @@ signupForm.addEventListener('submit',async event=>{
     document.getElementById('signup-status').hidden=false;
     signupForm.querySelectorAll('input,select,button').forEach(input=>input.disabled=true);
     signupComplete=true;
-  }catch(error){showErr(error.message||t('signup_error'));}
+  }catch(error){
+    if(error.codeCreated)showSignupCodeStep(error.message||t('signup_error'),true);
+    showErr(error.message||t('signup_error'));
+  }
   finally{button.disabled=signupComplete;}
 });
 

@@ -89,14 +89,16 @@ Deno.serve(async (request) => {
       ]);
       const sentChannels = deliveries.flatMap((delivery, index) =>
         delivery.status === "fulfilled" ? [index === 0 ? "sms" : "whatsapp"] : []);
+      const failedChannels = deliveries.flatMap((delivery, index) =>
+        delivery.status === "rejected" ? [index === 0 ? "sms" : "whatsapp"] : []);
       if (sentChannels.length === 0) {
         const failures = deliveries.flatMap((delivery) =>
           delivery.status === "rejected"
             ? [delivery.reason instanceof Error ? delivery.reason.message : "Message delivery failed."]
             : []);
-        return reply({ error: `Could not send the verification code. ${failures.join(" ")}` }, 503);
+        return reply({ error: `Could not send the verification code. ${failures.join(" ")}`, codeCreated: true }, 503);
       }
-      return reply({ sent: true, sentChannels });
+      return reply({ sent: true, sentChannels, failedChannels });
     }
 
     if (action === "verify-code") {
