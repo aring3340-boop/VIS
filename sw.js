@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vis-shell-v18';
+const CACHE_NAME = 'vis-shell-v19';
 const APP_SHELL = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './js/public.js',
   './js/program.js',
   './js/pwa.js',
+  './js/welcome.js',
   './js/auth.js',
   './js/login.js',
   './js/admin.js',

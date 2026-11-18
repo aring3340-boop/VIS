@@ -17,6 +17,22 @@
 </head>
 <body class="public-site">
 
+<div class="welcome-splash" id="welcome-splash" role="status" aria-live="polite">
+  <div class="welcome-splash__content">
+    <div class="welcome-splash__seal">
+      <span class="welcome-splash__orbit welcome-splash__orbit--outer" aria-hidden="true"></span>
+      <span class="welcome-splash__orbit welcome-splash__orbit--inner" aria-hidden="true"></span>
+      <img src="assets/institute-logo.jpg" alt="VIS institute seal">
+    </div>
+    <p class="welcome-splash__eyebrow">VOCATIONAL INSTITUTE OF SULAIMANYAH</p>
+    <h1 data-i18n="welcome_to_vis">Welcome to VIS</h1>
+    <p class="welcome-splash__subtitle" data-i18n="welcome_subtitle">Learn with purpose. Build your future.</p>
+    <div class="welcome-splash__progress" aria-hidden="true"><span></span></div>
+    <button class="welcome-splash__continue" id="welcome-continue" type="button" data-i18n="welcome_continue">Enter the website</button>
+  </div>
+  <p class="welcome-splash__footer" aria-hidden="true">SULAYMANIYAH · KURDISTAN REGION</p>
+</div>
+
 <nav class="navbar">
   <div class="container">
     <a class="brand" href="#top">
@@ -232,5 +248,6 @@ renderPublic=function(){_origRender();
 boot(renderPublic);
 </script>
 <script src="js/pwa.js"></script>
+<script src="js/welcome.js"></script>
 </body>
 </html>

@@ -9,6 +9,22 @@
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+<div class="welcome-splash" id="welcome-splash" role="status" aria-live="polite">
+  <div class="welcome-splash__content">
+    <div class="welcome-splash__seal">
+      <span class="welcome-splash__orbit welcome-splash__orbit--outer" aria-hidden="true"></span>
+      <span class="welcome-splash__orbit welcome-splash__orbit--inner" aria-hidden="true"></span>
+      <img src="assets/institute-logo.jpg" alt="VIS institute seal">
+    </div>
+    <p class="welcome-splash__eyebrow">VOCATIONAL INSTITUTE OF SULAIMANYAH</p>
+    <h1 data-i18n="welcome_to_vis">Welcome to VIS</h1>
+    <p class="welcome-splash__subtitle" data-i18n="welcome_subtitle">Learn with purpose. Build your future.</p>
+    <div class="welcome-splash__progress" aria-hidden="true"><span></span></div>
+    <button class="welcome-splash__continue" id="welcome-continue" type="button" data-i18n="welcome_continue">Enter the website</button>
+  </div>
+  <p class="welcome-splash__footer" aria-hidden="true">SULAYMANIYAH · KURDISTAN REGION</p>
+</div>
+
 <div class="auth-wrap">
   <div class="auth-brand">
     <a class="brand" href="index.html"><img class="logo" src="assets/institute-logo.jpg" alt="Vocational Institute of Sulaimanyah seal"><span>Vocational Institute of Sulaimanyah</span></a>
@@ -62,5 +78,6 @@
 <script src="js/common.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/login.js"></script>
+<script src="js/welcome.js"></script>
 </body>
 </html>
