@@ -22,10 +22,4 @@ document.getElementById('verify-form').addEventListener('submit',async e=>{
 });
 mountLangSwitch('lang-switch');
 mountThemeToggle('.theme-toggle');
-boot(()=>{}).then(()=>{
-  if(!document.querySelector('.public-preview-notice'))return;
-  document.querySelectorAll('#verify-form input, #verify-form button').forEach(control=>{control.disabled=true;});
-  const result=document.getElementById('v-result');
-  result.className='verify-result bad';
-  result.textContent=t('verify_unavailable');
-});
+boot(()=>{});

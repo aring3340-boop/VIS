@@ -33,21 +33,10 @@ python -m http.server 8000 --bind 127.0.0.1
 
 Open `http://localhost:8000`. Serving the folder lets the app cache its pages and assets for later offline use. The first visit must happen while the local server is running.
 
-## Demo accounts
+## Production data and security
 
-| Role | Sign-in tab | Username or email | Password |
-|---|---|---|---|
-| Owner | Staff | `visinstitute@gmail.com` | `Visinstitutesuli1` |
-| Student | Student | `ali.kareem` | `student123` |
-| Student | Student | `sara.ahmed` | `student123` |
-
-The owner can create local teacher and admin accounts from **Staff Accounts**. Students are managed locally in **Students**.
-
-## Local data and offline behavior
-
-- Records, settings, and uploaded files are stored in browser storage on this device. They are not shared or synchronized with other devices.
-- Use **Backup / restore** to export or restore a JSON backup. Keep backups private because they contain student and institute data.
-- Uploaded handbooks and exam PDFs are limited to 200 KB. Assignment attachments are also stored in the browser.
+- Records, settings, and uploaded files are stored in Supabase.
+- Staff accounts and student accounts use Supabase Auth.
+- Use **Backup / restore** to export or restore an authorized backup. Keep backups private because they contain student and institute data.
+- PDF uploads use the limits configured by the Supabase Storage buckets and Edge Functions.
 - Certificate and transcript documents use the browser's print dialog; choose its save-as-PDF option if you need a PDF file.
-- The app does not send contact forms, notifications, or messages outside this browser. AI assistance, remote account signup, analytics, external fonts, and social/chat integrations are not available.
-- Browser storage is not a secure production account system. Use this build for local demonstrations on a trusted device, and do not enter sensitive real-world records.

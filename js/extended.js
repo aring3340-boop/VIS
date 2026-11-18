@@ -36,7 +36,7 @@ var VisExtended = (() => {
     return `<div class="panel"><h3>${tr('exam_results')}</h3>
       <div class="form-grid"><div class="field"><label>${tr('student_label')}</label><select class="input" id="exam-student">${students.map(student => `<option value="${escape(student.id)}">${escape(studentName(student))} (@${escape(student.username)})</option>`).join('')}</select></div>
       <div class="field"><label>${tr('exam_term')}</label><input class="input" id="exam-term" maxlength="80"></div>
-      <div class="field"><label>${tr('exam_pdf')}</label><input class="input" id="exam-file" type="file" accept=".pdf,application/pdf" required><small class="muted">${tr('exam_pdf_hint_demo')}</small></div></div>
+      <div class="field"><label>${tr('exam_pdf')}</label><input class="input" id="exam-file" type="file" accept=".pdf,application/pdf" required><small class="muted">${tr('exam_pdf_hint')}</small></div></div>
       <button class="btn btn-gold" id="exam-save">${t('save')}</button></div>
       <div class="panel"><div class="table-wrap"><table><thead><tr><th>${tr('student_label')}</th><th>${tr('exam_term')}</th><th>${tr('exam_pdf')}</th><th>${t('date')}</th><th>${t('actions')}</th></tr></thead><tbody>${rows || `<tr><td colspan="5">${tr('no_exam_results')}</td></tr>`}</tbody></table></div></div>`;
   }

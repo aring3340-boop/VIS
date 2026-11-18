@@ -1,6 +1,5 @@
 
-/* ===== VIS Institute — dual-mode data layer (localStorage demo / Supabase) ===== */
-const DB_KEY='vis_db_v1';
+/* ===== VIS Institute — Supabase data layer ===== */
 const Vis={lang:localStorage.getItem('vis_lang')||'en'};
 
 const DEPTS={
@@ -131,20 +130,7 @@ function makeStorageAdapter(client){
   }};
 }
 
-async function hashPass(s){
-  try{
-    if(window.crypto&&crypto.subtle){
-      const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('vis::'+s));
-      return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
-    }
-  }catch(e){}
-  let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}
-  return 'f'+h.toString(16);
-}
-
 async function defaultData(){
-  const ownerHash=await hashPass('Visinstitutesuli1');
-  const stuHash=await hashPass('student123');
   return {
     settings:{
       siteName_en:'Vocational Institute of Sulaimanyah',siteName_ku:'پەیمانگەی پیشەیی سلێمانی',
@@ -177,69 +163,33 @@ async function defaultData(){
     ],
     gallery:[],
     instructors:[],resources:[],
-    students:[
-      {id:'s1',username:'ali.kareem',pass:stuHash,name_en:'Ali Kareem',name_ku:'عەلی کریم',dept:'it',stage:2,phone:'0770 000 0000',email:'ali@example.com',dob:'2004-05-12',attendance:92,attMap:{},grades:[{subject:'Programming',score:88},{subject:'Networking',score:76},{subject:'English',score:81}]},
-      {id:'s2',username:'sara.ahmed',pass:stuHash,name_en:'Sara Ahmed',name_ku:'سارا ئەحمەد',dept:'health',stage:1,phone:'0771 111 1111',email:'sara@example.com',dob:'2005-02-03',attendance:97,attMap:{},grades:[{subject:'Anatomy',score:90},{subject:'First Aid',score:85}]}
-    ],
+    students:[],
     messages:[],certificates:[],notifications:[],accessRequests:[],schedule:[],assignments:[],materials:[],submissions:[],
     examResults:[],publicTimetable:[],
-    admins:[{id:'a1',email:'visinstitute@gmail.com',pass:ownerHash,name:'Institute Owner',role:'owner'}]
+    admins:[]
   };
 }
 
-/* ---------- Store: single interface, two backends ---------- */
+/* ---------- Store: Supabase backend ---------- */
 const Store={
-  mode:'local',data:null,db:null,auth:null,storage:null,functions:null,supabase:null,legacyPublicResources:false,
+  mode:'supabase',data:null,db:null,auth:null,storage:null,functions:null,supabase:null,legacyPublicResources:false,
   async init(){
-    if(typeof supabaseConfigured!=='function'){
-      console.warn('Supabase configuration is unavailable; using local browser data.');
-      this.mode='local';await this.localInit();return;
+    if(typeof supabaseConfigured!=='function'||!supabaseConfigured()){
+      throw new Error('Supabase configuration is required.');
     }
-    if(supabaseConfigured()){
-      await loadSupabaseSDK();
-      this.supabase=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey,{global:{fetch:supabaseFetchWithTimeout}});
-      this.db=makeDatabaseAdapter(this.supabase);
-      this.auth=this.supabase.auth;
-      this.storage=makeStorageAdapter(this.supabase);
-      this.functions={httpsCallable:name=>async data=>{
-        const {data:result,error}=await this.supabase.functions.invoke(name,{body:data});
-        if(error)throw supabaseError(error);
-        return {data:result};
-      }};
-      this.mode='supabase';
-      await this.cloudLoad();
-      return;
-    }
-    this.mode='local';await this.localInit();
+    await loadSupabaseSDK();
+    if(!window.supabase?.createClient)throw new Error('Supabase SDK could not be loaded.');
+    this.supabase=window.supabase.createClient(SUPABASE_CONFIG.url,SUPABASE_CONFIG.anonKey,{global:{fetch:supabaseFetchWithTimeout}});
+    this.db=makeDatabaseAdapter(this.supabase);
+    this.auth=this.supabase.auth;
+    this.storage=makeStorageAdapter(this.supabase);
+    this.functions={httpsCallable:name=>async data=>{
+      const {data:result,error}=await this.supabase.functions.invoke(name,{body:data});
+      if(error)throw supabaseError(error);
+      return {data:result};
+    }};
+    await this.cloudLoad();
   },
-  async localInit(){
-    const def=await defaultData();
-    const raw=localStorage.getItem(DB_KEY);
-    if(raw){
-      try{const d=JSON.parse(raw);this.data={...def,...d,settings:{...def.settings,...(d.settings||{})}};}
-      catch(e){this.data=def;}
-    }else{this.data=def;}
-    ['programs','posts','events','gallery','students','messages','certificates','notifications','admins','accessRequests','schedule','assignments','materials','submissions','instructors','resources','examResults','publicTimetable'].forEach(c=>{
-      if(!Array.isArray(this.data[c]))this.data[c]=(def[c]||[]);
-    });
-    this.data.students=this.data.students.map(({feeTotal,branchId,...student})=>student);
-    this.data.schedule=this.data.schedule.map(({branchId,...entry})=>entry);
-    this.data.publicTimetable=this.data.publicTimetable.map(({branchId,...entry})=>entry);
-    this.data.examResults=this.data.examResults.filter(result=>result.filePath||result.fileData);
-    this.data.posts=this.data.posts.filter(post=>post.type!=='alumni').map(({storyRole_en,storyRole_ku,...post})=>post);
-    delete this.data.payments;
-    delete this.data.branches;
-    this.data.gallery=this.data.gallery.filter(item=>!(['g1','g2','g3'].includes(item.id)&&String(item.url||'').includes('images.unsplash.com')));
-    this.data.programs=this.data.programs.map(program=>{
-      const seed=def.programs.find(item=>item.id===program.id);
-      return seed?{...seed,...program}:program;
-    });
-    this.data.settings={...def.settings,...(this.data.settings||{})};
-    delete this.data.settings.publicResources;
-    this.data.students.forEach(s=>{if(!s.attMap)s.attMap={};});
-    this.persist();
-  },
-  persist(){if(this.mode==='local')localStorage.setItem(DB_KEY,JSON.stringify(this.data));},
   async cloudLoad(){
     const def=await defaultData();
     this.data={...def,students:[],messages:[],admins:[],accessRequests:[],certificates:[],notifications:[],schedule:[],assignments:[],materials:[],submissions:[],instructors:[],resources:[],examResults:[],publicTimetable:[]};
@@ -348,22 +298,17 @@ const Store={
   },
   coll(name){return this.data[name];},
   async setDoc(collName,obj){
-    if(this.mode==='supabase')await this.db.collection(collName).doc(obj.id).set(obj);
+    await this.db.collection(collName).doc(obj.id).set(obj);
     if(collName==='schedule')await this.publishSchedule(obj);
     const a=this.data[collName];const i=a.findIndex(x=>x.id===obj.id);
     if(i>=0)a[i]=obj;else a.push(obj);
-    this.persist();
   },
   async del(collName,id){
-    if(collName==='schedule'&&this.mode==='supabase')await this.db.collection('publicTimetable').doc(id).delete();
-    if(this.mode==='supabase')await this.db.collection(collName).doc(id).delete();
-    else if(collName==='students')this.data.accessRequests=this.data.accessRequests.filter(r=>r.studentId!==id);
-    else if(collName==='assignments')this.data.submissions=this.data.submissions.filter(s=>s.assignmentId!==id);
+    if(collName==='schedule')await this.db.collection('publicTimetable').doc(id).delete();
+    await this.db.collection(collName).doc(id).delete();
     this.data[collName]=this.data[collName].filter(x=>x.id!==id);
-    this.persist();
   },
   async publishSchedule(entry){
-    if(this.mode!=='supabase')return;
     const ref=this.db.collection('publicTimetable').doc(entry.id);
     if(!entry.weekly){await ref.delete();return;}
     const {id,kind,dept,stage,weekday,startTime,endTime,course,room}=entry;
@@ -372,8 +317,7 @@ const Store={
   async saveSettings(patch){
     Object.assign(this.data.settings,patch);
     delete this.data.settings.publicResources;
-    if(this.mode==='supabase')await this.db.collection('settings').doc('main').set(JSON.parse(JSON.stringify(this.data.settings)));
-    this.persist();
+    await this.db.collection('settings').doc('main').set(JSON.parse(JSON.stringify(this.data.settings)));
   },
   async removeLegacyPublicResources(){
     if(!this.legacyPublicResources)return;
@@ -384,95 +328,58 @@ const Store={
   },
   async uploadSubmission(file,assignmentId,studentId){
     if(!file)return {fileName:'',filePath:'',fileData:''};
-    if(this.mode==='supabase'){
-      if(file.size>2*1024*1024)throw new Error(t('file_too_large'));
-      const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-      const path=`submissions/${assignmentId}/${studentId}/${Date.now()}_${safeName}`;
-      await this.storage.ref(path).put(file);
-      return {fileName:file.name,filePath:path,fileData:''};
-    }
-    if(file.size>200*1024)throw new Error(t('file_too_large_demo'));
-    const fileData=await new Promise((resolve,reject)=>{
-      const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error(t('file_read_error')));reader.readAsDataURL(file);
-    });
-    return {fileName:file.name,filePath:'',fileData};
+    if(file.size>2*1024*1024)throw new Error(t('file_too_large'));
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    const path=`submissions/${assignmentId}/${studentId}/${Date.now()}_${safeName}`;
+    await this.storage.ref(path).put(file);
+    return {fileName:file.name,filePath:path,fileData:''};
   },
   async downloadSubmission(submission){
-    let url=submission.fileData;
-    if(this.mode==='supabase'){
-      const result=await this.functions.httpsCallable('get-submission-download')({submissionId:submission.id});
-      url=result.data.url;
-    }
-    const link=document.createElement('a');link.href=url;link.download=submission.fileName||'submission';
-    if(this.mode==='supabase')link.target='_blank';
+    const result=await this.functions.httpsCallable('get-submission-download')({submissionId:submission.id});
+    const link=document.createElement('a');link.href=result.data.url;link.download=submission.fileName||'submission';
+    link.target='_blank';
     document.body.appendChild(link);link.click();link.remove();
   },
   async deleteSubmissionFile(path){
-    if(this.mode==='supabase'&&path)await this.storage.ref(path).delete();
+    if(path)await this.storage.ref(path).delete();
   },
   async uploadResourceFile(file,resourceId){
     if(!file||file.type!=='application/pdf')throw new Error(t('resource_pdf_only'));
     if(file.size===0)throw new Error(t('resource_invalid'));
-    const maxSize=this.mode==='supabase'?10*1024*1024:200*1024;
-    if(file.size>maxSize)throw new Error(this.mode==='supabase'?t('resource_file_large'):t('resource_file_large_demo'));
+    const maxSize=10*1024*1024;
+    if(file.size>maxSize)throw new Error(t('resource_file_large'));
     const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100)||'handbook.pdf';
-    if(this.mode==='supabase'){
-      const path=`resources/${resourceId}/${Date.now()}_${safeName}`;
-      await this.storage.ref(path).put(file,{contentType:'application/pdf'});
-      return {fileName:file.name,filePath:path,fileData:'',fileSize:file.size};
-    }
-    const fileData=await new Promise((resolve,reject)=>{
-      const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error(t('file_read_error')));reader.readAsDataURL(file);
-    });
-    return {fileName:file.name,filePath:'',fileData,fileSize:file.size};
+    const path=`resources/${resourceId}/${Date.now()}_${safeName}`;
+    await this.storage.ref(path).put(file,{contentType:'application/pdf'});
+    return {fileName:file.name,filePath:path,fileData:'',fileSize:file.size};
   },
   async uploadExamResultFile(file,resultId,studentId){
-    const maxSize=this.mode==='supabase'?10*1024*1024:200*1024;
+    const maxSize=10*1024*1024;
     if(file.type!=='application/pdf'||!file.name.toLowerCase().endsWith('.pdf'))throw new Error(t('exam_pdf_only'));
-    if(!file.size||file.size>maxSize)throw new Error(t(this.mode==='supabase'?'exam_pdf_too_large':'exam_pdf_too_large_demo'));
-    if(this.mode==='supabase'){
-      const path=`exam-results/${studentId}/${resultId}.pdf`;
-      await this.storage.ref(path).put(file,{contentType:'application/pdf'});
-      return {fileName:file.name.slice(0,180),filePath:path,fileData:'',fileSize:file.size};
-    }
-    const fileData=await new Promise((resolve,reject)=>{
-      const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error(t('file_read_error')));reader.readAsDataURL(file);
-    });
-    return {fileName:file.name.slice(0,180),filePath:'',fileData,fileSize:file.size};
+    if(!file.size||file.size>maxSize)throw new Error(t('exam_pdf_too_large'));
+    const path=`exam-results/${studentId}/${resultId}.pdf`;
+    await this.storage.ref(path).put(file,{contentType:'application/pdf'});
+    return {fileName:file.name.slice(0,180),filePath:path,fileData:'',fileSize:file.size};
   },
   async downloadExamResultFile(result){
-    let blob;
-    if(this.mode==='supabase'){
-      const bytes=await this.storage.ref(result.filePath).getBytes(10*1024*1024);
-      blob=new Blob([bytes],{type:'application/pdf'});
-    }else{
-      const response=await fetch(result.fileData);
-      if(!response.ok)throw new Error(t('file_read_error'));
-      blob=await response.blob();
-    }
+    const bytes=await this.storage.ref(result.filePath).getBytes(10*1024*1024);
+    const blob=new Blob([bytes],{type:'application/pdf'});
     const url=URL.createObjectURL(blob),link=document.createElement('a');
     link.href=url;link.download=result.fileName||'exam-result.pdf';document.body.appendChild(link);link.click();link.remove();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   },
   async deleteExamResultFile(path){
-    if(this.mode==='supabase'&&path)await this.storage.ref(path).delete();
+    if(path)await this.storage.ref(path).delete();
   },
   async downloadResourceFile(resource){
-    let blob;
-    if(this.mode==='supabase'){
-      const bytes=await this.storage.ref(resource.filePath).getBytes(10*1024*1024);
-      blob=new Blob([bytes],{type:'application/pdf'});
-    }else{
-      const response=await fetch(resource.fileData);
-      if(!response.ok)throw new Error(t('file_read_error'));
-      blob=await response.blob();
-    }
+    const bytes=await this.storage.ref(resource.filePath).getBytes(10*1024*1024);
+    const blob=new Blob([bytes],{type:'application/pdf'});
     const url=URL.createObjectURL(blob),link=document.createElement('a');
     link.href=url;link.download=resource.fileName||'handbook.pdf';document.body.appendChild(link);link.click();link.remove();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   },
   async deleteResourceFile(path){
-    if(this.mode==='supabase'&&path)await this.storage.ref(path).delete();
+    if(path)await this.storage.ref(path).delete();
   },
 };
 

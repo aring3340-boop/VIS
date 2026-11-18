@@ -10,7 +10,7 @@ function switchTab(which){
   document.getElementById('signup-toggle').hidden=which!=='student';
   if(which==='staff')signupForm.hidden=true;
   const os=document.getElementById('owner-setup');
-  os.style.display=(which==='staff'&&Store.mode==='supabase'&&!Store.data.settings.ownerInitialized)?'block':'none';
+  os.style.display=(which==='staff'&&!Store.data.settings.ownerInitialized)?'block':'none';
   hideErr();
 }
 document.getElementById('tab-student').onclick=()=>switchTab('student');
@@ -110,7 +110,6 @@ signupForm.addEventListener('submit',async event=>{
   const button=document.getElementById('signup-submit');
   button.disabled=true;
   try{
-    if(Store.mode!=='supabase')throw new Error(t('signup_cloud_required'));
     const data=await sendSignupRequest(payload);
     if(!signupCodeSent){
       signupCodeSent=true;
@@ -166,14 +165,8 @@ document.getElementById('owner-setup-form').addEventListener('submit',async e=>{
   const email=document.getElementById('o-email').value.trim().toLowerCase();
   const pass=document.getElementById('o-pass').value;
   if(!name||!email||pass.length<8){showErr(t('err_fill'));return;}
-  if(Store.mode==='supabase'){
-    try{await Store.functions.httpsCallable('setup-owner')({name,email,password:pass});}
-    catch(err){showErr(err.message||t('owner_exists'));return;}
-  }else{
-    const res=await Auth.createAuthAccount(email,pass);
-    if(!res.ok){showErr(t('username_taken'));return;}
-    await Store.setDoc('admins',{id:res.uid,email,name,role:'owner'});
-  }
+  try{await Store.functions.httpsCallable('setup-owner')({name,email,password:pass});}
+  catch(err){showErr(err.message||t('owner_exists'));return;}
   const a=await Auth.loginStaff(email,pass);
   if(a){setSession({type:'admin',id:a.id,role:a.role});location.href='admin.html';}
 });
@@ -181,7 +174,6 @@ document.getElementById('owner-setup-form').addEventListener('submit',async e=>{
 mountLangSwitch('lang-switch');
 mountThemeToggle('.theme-toggle');
 boot(()=>{
-  document.getElementById('mode-badge').textContent=Store.mode==='supabase'?('☁️ '+t('mode_supabase')):('💻 '+t('mode_demo'));
   switchTab(location.hash==='#staff'?'staff':'student');
   if(new URLSearchParams(location.search).get('reset')==='1'){
     document.querySelector('.tabs').style.display='none';

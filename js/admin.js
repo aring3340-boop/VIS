@@ -95,7 +95,7 @@ function vResources(){
       <div class="field"><label>${t('resource_title_en')}</label><input id="resource-title-en" class="input" maxlength="160" value="${esc(entry?.title_en||'')}"></div>
       <div class="field"><label>${t('resource_title_ku')}</label><input id="resource-title-ku" class="input" maxlength="160" dir="rtl" value="${esc(entry?.title_ku||'')}"></div>
     </div>
-    <div class="field"><label>${t('resource_file')}</label><input id="resource-file" class="input" type="file" accept=".pdf,application/pdf"><small class="muted">${t('resource_file_large_demo')}</small></div>
+    <div class="field"><label>${t('resource_file')}</label><input id="resource-file" class="input" type="file" accept=".pdf,application/pdf"><small class="muted">${t('resource_file_large')}</small></div>
     <div class="row-actions"><button class="btn btn-gold" id="resource-save">${t('save')}</button>${entry?`<button class="btn btn-ghost" id="resource-cancel">${t('cancel')}</button>`:''}</div></div>
     <div class="panel"><h3>${t('resources_admin')}</h3><div class="table-wrap"><table><thead><tr><th>${t('resource_category')}</th><th>${t('resource_title_en')}</th><th>${t('resource_file')}</th><th>${t('actions')}</th></tr></thead><tbody>
       ${Store.data.resources.map(item=>`<tr><td>${esc(item.category)}</td><td>${esc(item.title_en||item.title_ku)}</td><td><button class="btn btn-ghost btn-sm" data-resource-download="${esc(item.id)}">${t('resource_open')}</button> ${esc(item.fileName)}</td><td>${canEdit(item)?`<div class="row-actions"><button class="btn btn-ghost btn-sm" data-resource-edit="${esc(item.id)}">${t('edit')}</button><button class="btn btn-danger btn-sm" data-resource-delete="${esc(item.id)}">${t('del')}</button></div>`:`<span class="muted">—</span>`}</td></tr>`).join('')||`<tr><td colspan="4" class="muted">${t('resource_empty')}</td></tr>`}
@@ -116,7 +116,7 @@ async function saveResource(){
     await Store.setDoc('resources',record);
   }catch(error){
     if(uploaded?.filePath)try{await Store.deleteResourceFile(uploaded.filePath);}catch(cleanupError){console.error('Could not remove an incomplete handbook upload:',cleanupError);}
-    if(error?.message===t('resource_pdf_only')||error?.message===t('resource_file_large')||error?.message===t('resource_file_large_demo'))toast(error.message,false);
+    if(error?.message===t('resource_pdf_only')||error?.message===t('resource_file_large'))toast(error.message,false);
     else{console.error('Could not save private student resource:',error);toast(t('admin_save_error'),false);}
     return;
   }
@@ -414,10 +414,17 @@ async function saveStudent(){
     dob:val('f-dob'),grades,...(sess.role==='teacher'?{}:{teacherId:val('f-teacher')||sess.id})};
   if(stu){
     Object.assign(stu,data);
-    if(pass)stu.pass=await hashPass(pass);
+    if(pass){
+      await Store.supabase.functions.invoke('send-student-password-reset',{body:{
+        studentId:stu.id,
+        redirectTo:`${location.origin}${location.pathname.replace(/[^/]*$/, '')}login.html?reset=1`
+      }});
+    }
     await Store.setDoc('students',stu);
   }else{
-    const ns={id:uid('s'),username:user,pass:await hashPass(pass),teacherId:sess.id,sharedWith:[],attendance:100,attMap:{},...data};
+    const account=await Auth.createAuthAccount(synEmail(user),pass,'student');
+    if(!account.ok){toast(account.error||t('username_taken'),false);return;}
+    const ns={id:account.uid,username:user,teacherId:sess.id,sharedWith:[],attendance:100,attMap:{},...data};
     await Store.setDoc('students',ns);
   }
   showStuForm=false;stuEditId=null;toast(t('saved_ok'));render();
@@ -789,8 +796,10 @@ async function saveStaff(){
   if(!['teacher','admin','content_editor'].includes(role)){toast(t('err_fill'),false);return;}
   if(d.admins.some(a=>(a.username||'').toLowerCase()===username||(a.email||'').toLowerCase()===username)
     ||d.students.some(s=>(s.username||'').toLowerCase()===username)){toast(t('username_taken'),false);return;}
-  const email=`${username}@local.invalid`;
-  await Store.setDoc('admins',{id:uid('a'),email,username,pass:await hashPass(pass),name,role});
+  const email=synEmail(username);
+  const account=await Auth.createAuthAccount(email,pass,role);
+  if(!account.ok){toast(account.error||t('username_taken'),false);return;}
+  await Store.setDoc('admins',{id:account.uid,email,username,name,role});
   toast(t('saved_ok'));render();
 }
 
@@ -809,9 +818,10 @@ async function changePw(){
   const a=Store.data.admins.find(x=>x.id===sess.id);if(!a)return;
   const cur=val('pw-cur'),np=val('pw-new');
   if(np.length<6){toast(t('pw_short'),false);return;}
-  if(a.pass!==await hashPass(cur)){toast(t('wrong_current'),false);return;}
-  a.pass=await hashPass(np);await Store.setDoc('admins',a);
-  toast(t('pw_changed'));render();
+  try{
+    await Auth.changePassword(a.email,cur,np);
+    toast(t('pw_changed'));render();
+  }catch(error){toast(error.message||t('wrong_current'),false);}
 }
 
 /* ---------- CSV exports ---------- */
@@ -895,8 +905,12 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('[data-sedit]')){stuEditId=b.dataset.sedit;showStuForm=true;render();window.scrollTo({top:0,behavior:'smooth'});return;}
   if(b=q('[data-srpw]')){
     const stu=Store.data.students.find(x=>x.id===b.dataset.srpw);if(!stu)return;
-    const password=prompt(t('new_pw'));
-    if(password&&password.length>=6){stu.pass=await hashPass(password);await Store.setDoc('students',stu);toast(t('pw_changed'));}
+    try{
+      const redirectTo=`${location.origin}${location.pathname.replace(/[^/]*$/, '')}login.html?reset=1`;
+      const {error}=await Store.supabase.functions.invoke('send-student-password-reset',{body:{studentId:stu.id,redirectTo}});
+      if(error)throw error;
+      toast(t('reset_hint'));
+    }catch(error){toast(error.message||t('err_generic'),false);}
     return;
   }
   if(b=q('[data-satt]')){stuAttId=b.dataset.satt;showStuForm=false;const d2=new Date();attView={y:d2.getFullYear(),m:d2.getMonth()};render();return;}
@@ -984,7 +998,6 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
 });
 document.getElementById('tab-content').addEventListener('change',VisExtended.handleAdminChange);
 boot(()=>{
-  document.getElementById('mode-badge').textContent='💻 '+t('mode_demo');
   render();
 });
 }
