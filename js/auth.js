@@ -11,7 +11,7 @@ const Auth={
       const {data,error}=await Store.auth.signInWithPassword({email:synEmail(username.trim()),password});
       if(error)throw error;
       const doc=await Store.db.collection('students').doc(data.user.id).get();
-      if(!doc.exists){await Store.auth.signOut();return {pendingApproval:true};}
+      if(!doc.exists){await Store.auth.signOut();return null;}
       const stu={id:doc.id,...doc.data()};
       Store.data.students=[stu];
       return stu;

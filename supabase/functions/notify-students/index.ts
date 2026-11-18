@@ -1,5 +1,4 @@
 import { reply, service } from "../_shared/http.ts";
-import { sendTwilioMessage } from "../_shared/twilio.ts";
 
 async function sendEmail(to: string, subject: string, text: string) {
   const apiKey = Deno.env.get("RESEND_API_KEY");
@@ -15,7 +14,6 @@ async function sendEmail(to: string, subject: string, text: string) {
 
 async function deliver(student: Record<string, unknown>, subject: string, message: string, eventId: string) {
   const email = String(student.email || "").trim();
-  const phone = String(student.phone || "").replace(/[ ()-]/g, "");
   const deliveryKey = `${eventId}:${String(student.id || "")}`;
   const { data: claim, error: claimError } = await service.from("vis_notification_deliveries")
     .upsert({ delivery_id: deliveryKey }, { onConflict: "delivery_id", ignoreDuplicates: true })
@@ -25,12 +23,6 @@ async function deliver(student: Record<string, unknown>, subject: string, messag
   try {
     if (student.emailOptIn === true && /^\S+@\S+\.\S+$/.test(email)) {
       await sendEmail(email, subject, message);
-    }
-    if (student.smsOptIn === true && /^\+[1-9]\d{7,14}$/.test(phone)) {
-      await sendTwilioMessage(phone, message, "sms");
-    }
-    if (student.whatsappOptIn === true && /^\+[1-9]\d{7,14}$/.test(phone)) {
-      await sendTwilioMessage(phone, message, "whatsapp");
     }
   } catch (error) {
     const { error: cleanupError } = await service.from("vis_notification_deliveries")

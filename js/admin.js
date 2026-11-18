@@ -332,6 +332,9 @@ function vStudents(){
       <div class="field"><label>${t('dob')}</label><input id="f-dob" type="date" class="input" value="${esc(stu?.dob||'')}"></div>
       <div class="field"><label>${t('email')}</label><input id="f-email" class="input" value="${esc(stu?.email||'')}"></div>
     </div>
+    <div class="form-grid" style="margin:10px 0 18px">
+      <label class="check"><input id="f-email-opt-in" type="checkbox" ${stu?.emailOptIn===true?'checked':''}> <span>${t('email_alert_consent')}</span></label>
+    </div>
     <label class="grade-label" style="font-weight:700;font-size:.86rem;display:block;margin-bottom:10px">${t('grades')}</label>
     <div id="grade-rows">${gradeRowsHtml(stu?.grades)}</div>
     <button type="button" class="btn btn-ghost btn-sm" id="add-grade" style="margin-bottom:18px">${t('add_grade')}</button>
@@ -411,8 +414,13 @@ async function saveStudent(){
   if((stage<1||stage>5)&&!(stu&&stage===Number(stu.stage))){toast(t('err_fill'),false);return;}
   const phone=val('f-phone').replace(/[ ()-]/g,'');
   const data={name_en,name_ku,dept:val('f-dept'),stage,className:val('f-class'),phone,email:val('f-email'),
-    dob:val('f-dob'),grades,...(sess.role==='teacher'?{}:{teacherId:val('f-teacher')||sess.id})};
+    dob:val('f-dob'),grades,
+    emailOptIn:document.getElementById('f-email-opt-in')?.checked===true,
+    ...(sess.role==='teacher'?{}:{teacherId:val('f-teacher')||sess.id})};
   if(stu){
+    delete stu.smsOptIn;
+    delete stu.whatsappOptIn;
+    delete stu.messagingConsentAt;
     Object.assign(stu,data);
     if(pass){
       await Store.supabase.functions.invoke('send-student-password-reset',{body:{

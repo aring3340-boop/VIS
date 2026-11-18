@@ -5,6 +5,3 @@ verify_jwt = false
 
 [functions.notify-students]
 verify_jwt = false
-
-[functions.student-signup]
-verify_jwt = false

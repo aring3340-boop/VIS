@@ -47,27 +47,6 @@
         <div class="field"><label data-i18n="password"></label><div class="password-input-wrap"><input id="stu-pass" type="password" class="input" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-target="stu-pass" data-i18n="show_password" aria-label="Show password"></button></div></div>
         <button class="btn btn-gold btn-block" data-i18n="sign_in"></button>
       </form>
-      <button class="btn btn-ghost btn-block" id="signup-toggle" type="button" style="margin-top:14px" data-i18n="student_signup"></button>
-      <form id="signup-form" hidden>
-        <h2 class="auth-title" data-i18n="student_signup"></h2>
-        <p class="muted" style="margin-bottom:16px" data-i18n="signup_approval_note"></p>
-        <p id="signup-status" class="muted" role="status" hidden></p>
-        <div class="field"><label for="signup-name" data-i18n="student_full_name"></label><input id="signup-name" class="input" maxlength="120" required></div>
-        <div class="field"><label for="signup-username" data-i18n="username"></label><input id="signup-username" class="input" minlength="3" maxlength="40" autocomplete="username" required></div>
-        <div class="field"><label for="signup-phone" data-i18n="phone_required"></label><input id="signup-phone" class="input" type="tel" placeholder="+964…" autocomplete="tel" pattern="\+[1-9][0-9]{7,14}" required></div>
-        <div class="field"><label for="signup-email" data-i18n="email_optional"></label><input id="signup-email" class="input" type="email" autocomplete="email"></div>
-        <div class="form-grid">
-          <div class="field"><label for="signup-dept" data-i18n="dept"></label><select id="signup-dept" class="input" required><option value="it">Information Technology</option><option value="business">Business Administration</option><option value="health">Health & Nursing</option><option value="electrical">Electrical & Electronics</option></select></div>
-          <div class="field"><label for="signup-stage" data-i18n="stage"></label><select id="signup-stage" class="input" required><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-          <div class="field"><label for="signup-age" data-i18n="signup_age"></label><input id="signup-age" class="input" type="number" min="10" max="80" required></div>
-        </div>
-        <div class="field"><label for="signup-password" data-i18n="password"></label><input id="signup-password" class="input" type="password" minlength="8" autocomplete="new-password" required></div>
-        <label class="check" style="margin:12px 0"><input id="signup-consent" type="checkbox" required> <span data-i18n="signup_messaging_consent"></span></label>
-        <div class="field" id="signup-code-field" hidden><label for="signup-code" data-i18n="signup_code"></label><input id="signup-code" class="input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></div>
-        <button class="btn btn-gold btn-block" id="signup-submit" data-i18n="signup_send_code"></button>
-        <button class="btn btn-ghost btn-block" id="signup-resend" type="button" style="margin-top:8px" data-i18n="signup_resend" hidden></button>
-        <button class="btn btn-ghost btn-block" id="signup-cancel" type="button" style="margin-top:8px" data-i18n="cancel"></button>
-      </form>
 
       <form id="form-staff" style="display:none">
         <div class="field"><label data-i18n="staff_login"></label><input id="staff-email" type="text" class="input" autocomplete="username" required></div>

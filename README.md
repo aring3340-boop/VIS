@@ -18,10 +18,12 @@ The live website and its cloud services are separate:
    supabase functions deploy
    ```
 
-3. Configure the Edge Function secrets in Supabase, not in browser JavaScript or the repository: `SIGNUP_OTP_SECRET`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `TWILIO_WHATSAPP_FROM`, and the approved `TWILIO_WHATSAPP_OTP_TEMPLATE_SID` / `TWILIO_WHATSAPP_TEMPLATE_SID`. Set `TWILIO_WHATSAPP_FROM` to the WhatsApp sender in `whatsapp:+<number>` format, and make sure the approved OTP template contains the `{{1}}` code variable. The SMS and WhatsApp channels require a configured Twilio account and may incur charges.
-4. In Supabase Auth URL settings, add the GitHub Pages URL as an allowed site/redirect URL. Test signup using a real phone you control, confirm the delivery channel reported by the site, and verify that the application remains pending until approved by an administrator.
+3. For automatic email grade and announcement alerts, configure `RESEND_API_KEY`, `EMAIL_FROM`, and `VIS_NOTIFICATION_WEBHOOK_SECRET` as Supabase Edge Function secrets.
 
-The GitHub Pages workflow publishes only the static website; it does not deploy database migrations or Edge Functions. Do not put a Supabase service-role key or Twilio credentials in `js/supabase-config.js`, GitHub Pages files, or any public commit. The website can be hosted free, but real SMS and WhatsApp delivery is not guaranteed to be free.
+   In the Supabase Dashboard, open **Project Settings → Edge Functions → Secrets** (wording may vary by dashboard version), add those secrets, and save. Create Supabase Database Webhooks for `app_records` inserts and updates, set the `x-vis-webhook-secret` header to the same webhook secret, and point them to `https://<project-ref>.supabase.co/functions/v1/notify-students`.
+4. In Supabase Auth URL settings, add the GitHub Pages URL as an allowed site/redirect URL. Test sign-in and password recovery using accounts created by institute staff.
+
+The GitHub Pages workflow publishes only the static website; it does not deploy database migrations or Edge Functions. Do not put a Supabase service-role key or provider credentials in `js/supabase-config.js`, GitHub Pages files, or any public commit. The website can be hosted free.
 
 ## Run locally
 

@@ -163,6 +163,9 @@ if(sess){
         submitButton.disabled=false;
       }
     });
-    boot(render);
+    boot(()=>{
+      render();
+      renderMessageRecipients();
+    });
   }
 }
