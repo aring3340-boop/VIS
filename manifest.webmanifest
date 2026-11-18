@@ -5,8 +5,8 @@
   "start_url": "./login.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#5b5b5d",
-  "theme_color": "#5b5b5d",
+  "background_color": "#49494b",
+  "theme_color": "#49494b",
   "icons": [
     {
       "src": "./assets/institute-logo.jpg",
