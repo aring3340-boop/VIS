@@ -1,5 +1,7 @@
 import { accountRole, preflight, reply, service, signedInUser } from "../_shared/http.ts";
 
+// Supabase account provisioning endpoint.
+
 Deno.serve(async (request) => {
   const options = preflight(request);
   if (options) return options;
