@@ -25,15 +25,15 @@ jobs:
       SUPABASE_PROJECT_REF: gwypqxdgubkzhuzpldvm
     steps:
       - uses: actions/checkout@v4
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
       - name: Require Supabase deployment secrets
         run: |
           if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
             echo "::error::Add SUPABASE_ACCESS_TOKEN as a GitHub Actions repository secret."
             exit 1
           fi
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.54.11
       - name: Require database password for migrations
         if: ${{ inputs.apply_migrations }}
         run: |
