@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vis-shell-v21';
+const CACHE_NAME = 'vis-shell-v22';
 const APP_SHELL = [
   './',
   './index.html',

@@ -9,7 +9,7 @@ const nowD=new Date();let attView={y:nowD.getFullYear(),m:nowD.getMonth()};
 let showPostForm=false,postEditId=null;
 let showEvForm=false,evEditId=null;
 let showProgForm=false,progEditId=null;
-let showGalForm=false;
+let showGalForm=false,galEditId=null;
 let showNotifForm=false;
 let showScheduleForm=false,scheduleEditId=null;
 let learningMode='assignments',showAssignmentForm=false,assignmentEditId=null,showMaterialForm=false,materialEditId=null;
@@ -83,7 +83,8 @@ function vWebsiteEditor(){
     ['content',vContent()],['programs_m',vPrograms()],['posts',vPosts()],
     ['ev_m',vEvents()],['schedule',vSchedule()],['gal_m',vGallery()],['notifs',vNotifs()]
   ];
-  return `<p class="lead website-editor-hint">${t('website_editor_hint')}</p>`+
+  return `<div class="website-editor-toolbar"><p class="lead website-editor-hint">${t('website_editor_hint')}</p>
+    <a class="btn btn-ghost" href="index.html" target="_blank" rel="noopener">${t('view_site')} ↗</a></div>`+
     sections.map(([title,content],index)=>`<details class="website-editor-section"${index===0?' open':''}><summary>${t(title)}</summary>${content}</details>`).join('');
 }
 function vResources(){
@@ -161,9 +162,15 @@ async function saveInstructor(){
     qualifications_ku:document.getElementById('inst-qualifications-ku').value.trim()};
   await Store.setDoc('instructors',record);instructorEditId=null;toast(t('instructor_saved'));render();
 }
-async function runManagerSave(action){
+async function runManagerSave(action,button=null){
+  if(button?.disabled)return;
+  const label=button?.textContent;
+  if(button){button.disabled=true;button.textContent=t('saving');button.setAttribute('aria-busy','true');}
   try{await action();}
   catch(error){console.error('Could not save manager changes:',error);toast(t('admin_save_error'),false);}
+  finally{
+    if(button?.isConnected){button.disabled=false;button.textContent=label;button.removeAttribute('aria-busy');}
+  }
 }
 function vSchedule(){
   const entries=[...Store.data.schedule].sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.startTime).localeCompare(String(b.startTime)));
@@ -194,7 +201,7 @@ async function saveSchedule(){
   const date=val('sc-date'),course=val('sc-course'),weekly=document.getElementById('sc-weekly').checked;
   if((!weekly&&!date)||!course){toast(t('err_fill'),false);return;}
   const fields={kind:val('sc-kind'),date:weekly?'':date,weekly,weekday:Number(val('sc-weekday')),startTime:val('sc-start'),endTime:val('sc-end'),course,room:val('sc-room'),dept:val('sc-dept'),stage:Number(val('sc-stage')),notes:document.getElementById('sc-notes').value.trim()};
-  if(entry){Object.assign(entry,fields);await Store.setDoc('schedule',entry);}
+  if(entry)await Store.setDoc('schedule',{...entry,...fields});
   else await Store.setDoc('schedule',{id:uid('sch'),teacherId:sess.id,...fields});
   showScheduleForm=false;scheduleEditId=null;toast(t('learning_saved'));render();
 }
@@ -511,7 +518,11 @@ async function savePost(){
   const body_en=document.getElementById('p-body-en').value.trim(),body_ku=document.getElementById('p-body-ku').value.trim();
   if(!title_en&&!title_ku){toast(t('err_fill'),false);return;}
   const pinned=document.getElementById('p-pinned').checked;
-  if(p){Object.assign(p,{title_en,title_ku,body_en,body_ku,pinned,type:'announcement'});delete p.storyRole_en;delete p.storyRole_ku;await Store.setDoc('posts',p);}
+  if(p){
+    const record={...p,title_en,title_ku,body_en,body_ku,pinned,type:'announcement'};
+    delete record.storyRole_en;delete record.storyRole_ku;
+    await Store.setDoc('posts',record);
+  }
   else await Store.setDoc('posts',{id:uid('p'),title_en,title_ku,body_en,body_ku,pinned,type:'announcement',date:new Date().toISOString().slice(0,10)});
   showPostForm=false;postEditId=null;toast(t('saved_ok'));render();
 }
@@ -554,7 +565,7 @@ async function saveEvent(){
   if(!date||(!title_en&&!title_ku)){toast(t('err_fill'),false);return;}
   const data={date,time:val('ev-time'),location_en:val('ev-loc-en'),location_ku:val('ev-loc-ku'),
     title_en,title_ku,desc_en:document.getElementById('ev-desc-en').value.trim(),desc_ku:document.getElementById('ev-desc-ku').value.trim()};
-  if(p){Object.assign(p,data);await Store.setDoc('events',p);}
+  if(p)await Store.setDoc('events',{...p,...data});
   else await Store.setDoc('events',{id:uid('e'),...data});
   showEvForm=false;evEditId=null;toast(t('saved_ok'));render();
 }
@@ -563,6 +574,8 @@ async function saveEvent(){
 function vPrograms(){
   const d=Store.data;
   const p=progEditId?d.programs.find(x=>x.id===progEditId):null;
+  const restorePanel=d.programs.length?'':`<div class="panel"><p class="muted">${t('programs_empty_restore_hint')}</p>
+    <button class="btn btn-ghost" id="prog-restore">${t('restore_default_departments')}</button></div>`;
   let form='';
   if(showProgForm){
     form=`<div class="panel"><h3>${p?t('edit'):t('add_program')}</h3>
@@ -587,7 +600,7 @@ function vPrograms(){
     <div class="row-actions"><button class="btn btn-gold" id="prog-save">${t('save')}</button><button class="btn btn-ghost" id="prog-cancel">${t('cancel')}</button></div>
     </div>`;
   }
-  return form+`<div class="panel">
+  return form+restorePanel+`<div class="panel">
     <div class="search-row"><h3 style="margin:0">${t('programs_m')}</h3><span style="flex:1"></span><button class="btn btn-navy" id="prog-add">＋ ${t('add_program')}</button></div>
     <div class="table-wrap"><table><thead><tr><th>${t('icon')}</th><th>${t('title_en')}</th><th>${t('actions')}</th></tr></thead><tbody>
     ${d.programs.map(x=>`<tr><td style="font-size:1.3rem">${esc(x.icon||'🎓')}</td><td>${esc(pick({en:x.title_en,ku:x.title_ku})||x.title_en)}</td>
@@ -607,7 +620,7 @@ async function saveProgram(){
     certificate_en:val('g-certificate-en'),certificate_ku:val('g-certificate-ku'),
     careers_en:document.getElementById('g-careers-en').value.trim(),careers_ku:document.getElementById('g-careers-ku').value.trim()
   };
-  if(p){Object.assign(p,{title_en,title_ku,desc_en,desc_ku,icon,...details});await Store.setDoc('programs',p);}
+  if(p)await Store.setDoc('programs',{...p,title_en,title_ku,desc_en,desc_ku,icon,...details});
   else await Store.setDoc('programs',{id:uid('pr'),title_en,title_ku,desc_en,desc_ku,icon,...details});
   showProgForm=false;progEditId=null;toast(t('saved_ok'));render();
 }
@@ -616,14 +629,15 @@ async function saveProgram(){
 let galTmp=null;
 function vGallery(){
   const d=Store.data;
+  const entry=galEditId?d.gallery.find(item=>item.id===galEditId):null;
   let form='';
   if(showGalForm){
-    form=`<div class="panel"><h3>${t('upload_img')}</h3>
+    form=`<div class="panel"><h3>${entry?t('edit'):t('upload_img')}</h3>
     <label class="drop" id="gal-drop">${t('drop_hint')}<input type="file" id="gal-file" accept="image/*"></label>
-    <div id="gal-preview" style="margin-top:14px"></div>
+    <div id="gal-preview" style="margin-top:14px">${entry?`<img src="${esc(entry.url)}" alt="" style="max-width:260px;border-radius:12px">`:''}</div>
     <div class="form-grid" style="margin-top:14px">
-      <div class="field"><label>${t('caption_en')}</label><input id="gal-cap-en" class="input"></div>
-      <div class="field"><label>${t('caption_ku')}</label><input id="gal-cap-ku" class="input" dir="rtl"></div>
+      <div class="field"><label>${t('caption_en')}</label><input id="gal-cap-en" class="input" value="${esc(entry?.caption_en||'')}"></div>
+      <div class="field"><label>${t('caption_ku')}</label><input id="gal-cap-ku" class="input" dir="rtl" value="${esc(entry?.caption_ku||'')}"></div>
     </div>
     <div class="row-actions"><button class="btn btn-gold" id="gal-save">${t('save')}</button><button class="btn btn-ghost" id="gal-cancel">${t('cancel')}</button></div>
     </div>`;
@@ -635,7 +649,8 @@ function vGallery(){
     ${d.gallery.map(g=>`<figure class="gallery-item" style="box-shadow:none;border:1px solid var(--line)">
       <img src="${esc(g.url)}" alt="">
       <figcaption>${esc(pick({en:g.caption_en,ku:g.caption_ku})||'')}
-        <button class="btn btn-danger btn-sm" data-gldel="${g.id}" style="position:absolute;top:10px;inset-inline-end:10px">✕</button>
+        <div class="row-actions"><button class="btn btn-ghost btn-sm" data-gledit="${esc(g.id)}">${t('edit')}</button>
+        <button class="btn btn-danger btn-sm" data-gldel="${esc(g.id)}">${t('del')}</button></div>
       </figcaption></figure>`).join('')||`<p class="muted">${t('no_gallery')}</p>`}
     </div></div>`;
 }
@@ -644,17 +659,25 @@ function wireGallery(){
   if(!fi)return;
   fi.addEventListener('change',()=>{
     const f=fi.files[0];if(!f)return;
-    if(f.size>900*1024){toast(t('drop_hint'),false);return;}
+    if(!f.type.startsWith('image/')){toast(t('gallery_image_only'),false);fi.value='';return;}
+    if(f.size>900*1024){toast(t('gallery_file_large'),false);fi.value='';return;}
+    galTmp=null;
     const r=new FileReader();
-    r.onload=()=>{galTmp=r.result;document.getElementById('gal-preview').innerHTML=`<img src="${galTmp}" style="max-width:260px;border-radius:12px">`;};
+    r.onload=()=>{
+      if(typeof r.result!=='string'){toast(t('gallery_read_error'),false);return;}
+      galTmp=r.result;document.getElementById('gal-preview').innerHTML=`<img src="${galTmp}" alt="" style="max-width:260px;border-radius:12px">`;
+    };
+    r.onerror=()=>{console.error('Could not read selected gallery photo:',r.error);toast(t('gallery_read_error'),false);};
     r.readAsDataURL(f);
   });
 }
 async function saveGallery(){
-  if(!galTmp){toast(t('err_fill'),false);return;}
-  const id=uid('g');
-  await Store.setDoc('gallery',{id,url:galTmp,caption_en:val('gal-cap-en'),caption_ku:val('gal-cap-ku'),date:new Date().toISOString().slice(0,10)});
-  galTmp=null;showGalForm=false;toast(t('saved_ok'));render();
+  const entry=galEditId?Store.data.gallery.find(item=>item.id===galEditId):null;
+  if(!galTmp&&!entry){toast(t('err_fill'),false);return;}
+  const record={...(entry||{}),id:entry?.id||uid('g'),url:galTmp||entry.url,
+    caption_en:val('gal-cap-en'),caption_ku:val('gal-cap-ku'),date:entry?.date||new Date().toISOString().slice(0,10)};
+  await Store.setDoc('gallery',record);
+  galTmp=null;galEditId=null;showGalForm=false;toast(t('saved_ok'));render();
 }
 
 /* ---------- notifications ---------- */
@@ -745,6 +768,7 @@ function vContent(){
     <div class="field"><label>${t('hero_title_l')} (KU)</label><input id="c-hero-ku" class="input" dir="rtl" value="${esc(s.heroTitle_ku)}"></div>
     <div class="field"><label>${t('hero_sub_l')} (EN)</label><textarea id="c-sub-en" class="input" style="min-height:80px">${esc(s.heroSub_en)}</textarea></div>
     <div class="field"><label>${t('hero_sub_l')} (KU)</label><textarea id="c-sub-ku" class="input" dir="rtl" style="min-height:80px">${esc(s.heroSub_ku)}</textarea></div>
+    <div class="field"><label>${t('stats_trainers')}</label><input id="c-trainers" class="input" value="${esc(s.trainerCount||'50+')}"></div>
   </div>
   <div class="field"><label>${t('about_l')} (EN)</label><textarea id="c-about-en" class="input">${esc(s.about_en)}</textarea></div>
   <div class="field"><label>${t('about_l')} (KU)</label><textarea id="c-about-ku" class="input" dir="rtl">${esc(s.about_ku)}</textarea></div>
@@ -888,7 +912,7 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('#resource-save')){await saveResource();return;}
   if(b=q('#resource-cancel')){resourceEditId=null;render();return;}
   if(b=q('#sc-cancel')){showScheduleForm=false;scheduleEditId=null;render();return;}
-  if(b=q('#sc-save')){await saveSchedule();return;}
+  if(b=q('#sc-save')){await runManagerSave(saveSchedule,b);return;}
   if(b=q('[data-schedit]')){scheduleEditId=b.dataset.schedit;showScheduleForm=true;render();return;}
   if(b=q('[data-schdel]')){if(confirm(t('confirm_del'))){await Store.del('schedule',b.dataset.schdel);toast(t('deleted_ok'));render();}return;}
   if(b=q('[data-learning-mode]')){learningMode=b.dataset.learningMode;showAssignmentForm=showMaterialForm=false;assignmentEditId=materialEditId=null;render();return;}
@@ -949,13 +973,22 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('[data-ccopy]')){try{await navigator.clipboard.writeText(b.dataset.ccopy);}catch(err){}toast(t('copied'));return;}
   if(b=q('[data-cdel]')){if(confirm(t('confirm_del'))){await Store.del('certificates',b.dataset.cdel);toast(t('deleted_ok'));render();}return;}
   if(b=q('[data-pedit]')){postEditId=b.dataset.pedit;showPostForm=true;render();return;}
-  if(b=q('[data-pdel]')){if(confirm(t('confirm_del'))){await Store.del('posts',b.dataset.pdel);toast(t('deleted_ok'));render();}return;}
+  if(b=q('[data-pdel]')){if(confirm(t('confirm_del')))await runManagerSave(async()=>{await Store.del('posts',b.dataset.pdel);toast(t('deleted_ok'));render();},b);return;}
   if(b=q('[data-eedit]')){evEditId=b.dataset.eedit;showEvForm=true;render();return;}
-  if(b=q('[data-edel]')){if(confirm(t('confirm_del'))){await Store.del('events',b.dataset.edel);toast(t('deleted_ok'));render();}return;}
+  if(b=q('[data-edel]')){if(confirm(t('confirm_del')))await runManagerSave(async()=>{await Store.del('events',b.dataset.edel);toast(t('deleted_ok'));render();},b);return;}
   if(b=q('[data-gedit]')){progEditId=b.dataset.gedit;showProgForm=true;render();return;}
-  if(b=q('[data-gdel]')){if(confirm(t('confirm_del'))){await Store.del('programs',b.dataset.gdel);toast(t('deleted_ok'));render();}return;}
-  if(b=q('[data-gldel]')){if(confirm(t('confirm_del'))){await Store.del('gallery',b.dataset.gldel);toast(t('deleted_ok'));render();}return;}
-  if(b=q('[data-ndel]')){if(confirm(t('confirm_del'))){await Store.del('notifications',b.dataset.ndel);toast(t('deleted_ok'));render();}return;}
+  if(b=q('#prog-restore')){
+    if(!confirm(t('restore_default_departments_confirm')))return;
+    await runManagerSave(async()=>{
+      const defaults=await defaultData();
+      for(const program of defaults.programs)await Store.setDoc('programs',program);
+      toast(t('departments_restored'));render();
+    },b);
+    return;
+  }
+  if(b=q('[data-gdel]')){if(confirm(t('confirm_del')))await runManagerSave(async()=>{await Store.del('programs',b.dataset.gdel);toast(t('deleted_ok'));render();},b);return;}
+  if(b=q('[data-gldel]')){if(confirm(t('confirm_del')))await runManagerSave(async()=>{await Store.del('gallery',b.dataset.gldel);toast(t('deleted_ok'));render();},b);return;}
+  if(b=q('[data-ndel]')){if(confirm(t('confirm_del')))await runManagerSave(async()=>{await Store.del('notifications',b.dataset.ndel);toast(t('deleted_ok'));render();},b);return;}
   if(b=q('[data-mread]')){const m=Store.data.messages.find(x=>x.id===b.dataset.mread);if(m){m.read=!m.read;await Store.setDoc('messages',m);render();}return;}
   if(b=q('[data-mdel]')){if(confirm(t('confirm_del'))){await Store.del('messages',b.dataset.mdel);toast(t('deleted_ok'));render();}return;}
   if(b=q('[data-aedit]')){staffEditId=b.dataset.aedit;render();return;}
@@ -968,38 +1001,43 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('#stu-save')){await saveStudent();return;}
   if(b=q('#post-cancel')){showPostForm=false;postEditId=null;render();return;}
   if(b=q('#post-add')){showPostForm=true;postEditId=null;render();return;}
-  if(b=q('#post-save')){await savePost();return;}
+  if(b=q('#post-save')){await runManagerSave(savePost,b);return;}
   if(b=q('#ev-cancel')){showEvForm=false;evEditId=null;render();return;}
   if(b=q('#ev-add')){showEvForm=true;evEditId=null;render();return;}
-  if(b=q('#ev-save')){await saveEvent();return;}
+  if(b=q('#ev-save')){await runManagerSave(saveEvent,b);return;}
   if(b=q('#prog-cancel')){showProgForm=false;progEditId=null;render();return;}
   if(b=q('#prog-add')){showProgForm=true;progEditId=null;render();return;}
-  if(b=q('#prog-save')){await saveProgram();return;}
-  if(b=q('#gal-cancel')){showGalForm=false;galTmp=null;render();return;}
-  if(b=q('#gal-add')){showGalForm=true;galTmp=null;render();return;}
-  if(b=q('#gal-save')){await saveGallery();return;}
+  if(b=q('#prog-save')){await runManagerSave(saveProgram,b);return;}
+  if(b=q('#gal-cancel')){showGalForm=false;galTmp=null;galEditId=null;render();return;}
+  if(b=q('#gal-add')){showGalForm=true;galTmp=null;galEditId=null;render();return;}
+  if(b=q('[data-gledit]')){showGalForm=true;galEditId=b.dataset.gledit;galTmp=null;render();return;}
+  if(b=q('#gal-save')){await runManagerSave(saveGallery,b);return;}
   if(b=q('#notif-cancel')){showNotifForm=false;render();return;}
   if(b=q('#notif-add')){showNotifForm=true;render();return;}
-  if(b=q('#notif-send')){await sendNotif();return;}
+  if(b=q('#notif-send')){await runManagerSave(sendNotif,b);return;}
   if(b=q('#ex-stu')){exportStudents();return;}
   if(b=q('#ex-gra')){exportGrades();return;}
   if(b=q('#ex-att')){exportAtt();return;}
   if(b=q('#ex-msg')||q('#ex-msg2')){exportMsgs();return;  }
   if(b=q('#c-save')){
-    const siteText={siteName_en:val('c-site-name-en'),siteName_ku:val('c-site-name-ku'),since:val('c-since'),
-      whyTitle_en:val('c-why-title-en'),whyTitle_ku:val('c-why-title-ku'),faqTitle_en:val('c-faq-title-en'),faqTitle_ku:val('c-faq-title-ku')};
-    [1,2,3,4].forEach(number=>{
-      siteText[`why${number}_en`]=val(`c-why-${number}-en`);siteText[`why${number}_ku`]=val(`c-why-${number}-ku`);
-      siteText[`faqQ${number}_en`]=val(`c-faq-q${number}-en`);siteText[`faqQ${number}_ku`]=val(`c-faq-q${number}-ku`);
-      siteText[`faqA${number}_en`]=document.getElementById(`c-faq-a${number}-en`).value.trim();
-      siteText[`faqA${number}_ku`]=document.getElementById(`c-faq-a${number}-ku`).value.trim();
-    });
-    await Store.saveSettings({...siteText,heroTitle_en:val('c-hero-en'),heroTitle_ku:val('c-hero-ku'),
-      heroSub_en:document.getElementById('c-sub-en').value.trim(),heroSub_ku:document.getElementById('c-sub-ku').value.trim(),
-      about_en:document.getElementById('c-about-en').value.trim(),about_ku:document.getElementById('c-about-ku').value.trim(),
-      address_en:val('c-addr-en'),address_ku:val('c-addr-ku'),phone:val('c-phone'),email:val('c-email'),
-      officeHours_en:val('c-hours-en'),officeHours_ku:val('c-hours-ku')});
-    toast(t('saved_ok'));return;
+    await runManagerSave(async()=>{
+      const siteText={siteName_en:val('c-site-name-en'),siteName_ku:val('c-site-name-ku'),since:val('c-since'),
+        trainerCount:val('c-trainers'),
+        whyTitle_en:val('c-why-title-en'),whyTitle_ku:val('c-why-title-ku'),faqTitle_en:val('c-faq-title-en'),faqTitle_ku:val('c-faq-title-ku')};
+      [1,2,3,4].forEach(number=>{
+        siteText[`why${number}_en`]=val(`c-why-${number}-en`);siteText[`why${number}_ku`]=val(`c-why-${number}-ku`);
+        siteText[`faqQ${number}_en`]=val(`c-faq-q${number}-en`);siteText[`faqQ${number}_ku`]=val(`c-faq-q${number}-ku`);
+        siteText[`faqA${number}_en`]=document.getElementById(`c-faq-a${number}-en`).value.trim();
+        siteText[`faqA${number}_ku`]=document.getElementById(`c-faq-a${number}-ku`).value.trim();
+      });
+      await Store.saveSettings({...siteText,heroTitle_en:val('c-hero-en'),heroTitle_ku:val('c-hero-ku'),
+        heroSub_en:document.getElementById('c-sub-en').value.trim(),heroSub_ku:document.getElementById('c-sub-ku').value.trim(),
+        about_en:document.getElementById('c-about-en').value.trim(),about_ku:document.getElementById('c-about-ku').value.trim(),
+        address_en:val('c-addr-en'),address_ku:val('c-addr-ku'),phone:val('c-phone'),email:val('c-email'),
+        officeHours_en:val('c-hours-en'),officeHours_ku:val('c-hours-ku')});
+      toast(t('saved_ok'));
+    },b);
+    return;
   }
   if(b=q('#a-add')){await runManagerSave(saveStaff);return;}
   if(b=q('#acct-save')){await changePw();return;}

@@ -22,7 +22,7 @@ function supabaseFetchWithTimeout(input,init={}){
     if(init.signal.aborted)controller.abort(init.signal.reason);
     else init.signal.addEventListener('abort',()=>controller.abort(init.signal.reason),{once:true});
   }
-  return fetch(input,{...init,signal:controller.signal}).finally(()=>clearTimeout(timer));
+  return fetch(input,{...init,cache:'no-store',signal:controller.signal}).finally(()=>clearTimeout(timer));
 }
 
 function supabaseError(error){return error instanceof Error?error:new Error(error?.message||'Supabase request failed.');}
@@ -135,12 +135,12 @@ async function defaultData(){
     settings:{
       siteName_en:'Vocational Institute of Sulaimanyah',siteName_ku:'پەیمانگەی پیشەیی سلێمانی',
       heroTitle_en:'Professional Skills for a Changing World',heroTitle_ku:'شارەزایی پیشەیی بۆ جیهانێکی گۆڕاو',
-      heroSub_en:'Practical technical and vocational education in technology, business, health and engineering, supported by experienced instructors.',
-      heroSub_ku:'پەروەردەی کرداری و پیشەیی لە تەکنەلۆژیا، بازرگانی، تەندروستی و ئەندازیاری، بە پشتگیری مامۆستایانی شارەزا.',
-      about_en:'The Vocational Institute of Sulaimanyah is a leading institution dedicated to practical, career-focused education. We prepare students for the modern workforce through hands-on training, industry-aligned curricula, and experienced instructors across technology, business, health, and engineering trades.',
-      about_ku:'پەیمانگەی پیشەیی سلێمانی دامەزراوەیەکی پێشەنگە تەرخانکراوە بۆ پەروەردەی پراکتیکی ئامادەی کار. ئێمە قوتابیان ئامادەی بازاڕی کار دەکەین بە ڕاهێنانی پراکتیکی، بەرنامەی پەیوەست بە پیشە و مامۆستایانی شارەزا لە بوارەکانی تەکنەلۆژیا، بازرگانی، تەندروستی و ئەندازیاری.',
+      heroSub_en:'Practical technical and vocational education in information technology, business, design and tourism, supported by experienced instructors.',
+      heroSub_ku:'پەروەردەی کرداری و پیشەیی لە تەکنەلۆژیای زانیاری، بازرگانی، دیزاین و گەشتیاری، بە پشتگیری مامۆستایانی شارەزا.',
+      about_en:'The Vocational Institute of Sulaimanyah is a leading institution dedicated to practical, career-focused education. We prepare students for the modern workforce through hands-on training, industry-aligned curricula, and experienced instructors across information technology, business, design and tourism trades.',
+      about_ku:'پەیمانگەی پیشەیی سلێمانی دامەزراوەیەکی پێشەنگە تەرخانکراوە بۆ پەروەردەی پراکتیکی ئامادەی کار. ئێمە قوتابیان ئامادەی بازاڕی کار دەکەین بە ڕاهێنانی پراکتیکی، بەرنامەی پەیوەست بە پیشە و مامۆستایانی شارەزا لە بوارەکانی تەکنەلۆژیای زانیاری، بازرگانی، دیزاین و گەشتیاری.',
       address_en:'Salim Street, Sulaymaniyah, Kurdistan Region, Iraq',address_ku:'شەقامی سالم، سلێمانی، هەرێمی کوردستان، عێراق',
-      phone:'+964 770 000 0000',email:'visinstitute@gmail.com',officeHours_en:'',officeHours_ku:'',since:'2009',studentCount:0,ownerInitialized:false,
+      phone:'+964 770 000 0000',email:'visinstitute@gmail.com',officeHours_en:'',officeHours_ku:'',since:'2024',studentCount:0,trainerCount:'50+',ownerInitialized:false,
       socials:{facebook:'',instagram:'',youtube:'',telegram:'',whatsapp:''}
     },
     programs:[
@@ -168,6 +168,20 @@ async function defaultData(){
     examResults:[],publicTimetable:[],
     admins:[]
   };
+}
+
+function applySubjectCopyUpdates(settings){
+  const updates={
+    heroSub_en:['technology, business, design and tourism','information technology, business, design and tourism'],
+    about_en:['technology, business, health, and engineering','information technology, business, design and tourism'],
+    heroSub_ku:['تەکنەلۆژیا، بازرگانی، تەندروستی و ئەندازیاری','تەکنەلۆژیای زانیاری، بازرگانی، دیزاین و گەشتیاری'],
+    about_ku:['تەکنەلۆژیا، بازرگانی، تەندروستی و ئەندازیاری','تەکنەلۆژیای زانیاری، بازرگانی، دیزاین و گەشتیاری']
+  };
+  Object.entries(updates).forEach(([field,[oldList,newList]])=>{
+    const value=settings[field];
+    if(typeof value==='string'&&!value.includes(newList))settings[field]=value.replace(oldList,newList);
+  });
+  if(typeof settings.heroSub_en==='string')settings.heroSub_en=settings.heroSub_en.replace('tourism ,','tourism,');
 }
 
 /* ---------- Store: Supabase backend ---------- */
@@ -211,6 +225,7 @@ const Store={
       this.legacyPublicResources=Object.prototype.hasOwnProperty.call(settingsData,'publicResources');
       this.data.settings={...def.settings,...settingsData};
     }
+    applySubjectCopyUpdates(this.data.settings);
     delete this.data.settings.publicResources;
     const session=getSession();
     const {data:{session:authSession},error}=await this.auth.getSession();
@@ -315,9 +330,10 @@ const Store={
     await ref.set({id,kind,dept,stage,weekday,startTime,endTime,course,room});
   },
   async saveSettings(patch){
-    Object.assign(this.data.settings,patch);
-    delete this.data.settings.publicResources;
-    await this.db.collection('settings').doc('main').set(JSON.parse(JSON.stringify(this.data.settings)));
+    const settings={...this.data.settings,...patch};
+    delete settings.publicResources;
+    await this.db.collection('settings').doc('main').set(JSON.parse(JSON.stringify(settings)));
+    this.data.settings=settings;
   },
   async removeLegacyPublicResources(){
     if(!this.legacyPublicResources)return;

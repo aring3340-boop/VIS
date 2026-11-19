@@ -165,7 +165,6 @@ if(sess){
     });
     boot(()=>{
       render();
-      renderMessageRecipients();
     });
   }
 }

@@ -48,7 +48,8 @@ function renderPublic(){
   document.getElementById('office-hours-item').hidden=!officeHours;
   setText('footer-about',pick({en:s.about_en,ku:s.about_ku}));
   setText('stat-programs',d.programs.length);
-  setText('stat-students',d.students.length);
+  setText('stat-students',Number(s.studentCount)||0);
+  setText('stat-trainers',s.trainerCount||'50+');
   setText('stat-since',s.since);
   setText('footer-verify','· '+t('verify'));
   const y=document.getElementById('year');if(y)y.textContent=new Date().getFullYear();
