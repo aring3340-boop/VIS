@@ -145,9 +145,9 @@ async function defaultData(){
     },
     programs:[
       {id:'pr1',icon:'💻',title_en:'Information Technology',title_ku:'تەکنەلۆژیای زانیاری',desc_en:'Software development, networking, databases and office productivity for the digital workplace.',desc_ku:'پەرەپێدانی نەرمەکالا، تۆڕ، بنکەدراو و ئەپڵیکەیشنی ئۆفیس بۆ شوێنی کارە دیجیتاڵییەکان.',courses_en:'Software development\nComputer networking\nDatabase fundamentals\nOffice productivity',courses_ku:'پەرەپێدانی نەرمەکالا\nتۆڕی کۆمپیوتەر\nبنەماکانی بنکەدراو\nبەرهەمهێنانی ئۆفیس',careers_en:'Junior software developer\nIT support technician\nNetwork support assistant',careers_ku:'پەرەپێدەری نەرمەکالای سەرەتایی\nتەکنیکی پشتیوانی تەکنەلۆژیای زانیاری\nیاریدەدەری پشتیوانی تۆڕ'},
-      {id:'pr2',icon:'📊',title_en:'Business Administration',title_ku:'بەرێوەبردنی بازرگانی',desc_en:'Accounting, marketing, and management skills for modern businesses and entrepreneurship.',desc_ku:'ژمێریاری، بازرگانی و شارەزایی بەرێوەبردن بۆ بازرگانییە نوێکان و خاوەنکارایەتی.',courses_en:'Accounting fundamentals\nMarketing\nBusiness management\nEntrepreneurship',courses_ku:'بنەماکانی ژمێریاری\nبازرگانی\nبەرێوەبردنی بازرگانی\nخاوەنکارایەتی',careers_en:'Bookkeeping assistant\nMarketing assistant\nOffice administrator',careers_ku:'یاریدەدەری تۆمارکردنی ژمێریاری\nیاریدەدەری بازرگانی\nبەرێوەبەری نووسینگە'},
-      {id:'pr3',icon:'🩺',title_en:'Health & Nursing',title_ku:'تەندروستی و پەرستاری',desc_en:'Patient care, first aid and clinical fundamentals taught in partnership with local clinics.',desc_ku:'چاودێری نەخۆش، یارمەتی یەکەم و بنەما کلینیکییەکان بە هاوبەشی لەگەڵ کلینیکی ناوچەکە.',courses_en:'Patient care\nFirst aid\nClinical fundamentals',courses_ku:'چاودێری نەخۆش\nیارمەتی یەکەم\nبنەما کلینیکییەکان',careers_en:'Patient-care assistant\nFirst-aid responder\nClinical support assistant',careers_ku:'یاریدەدەری چاودێری نەخۆش\nیاریدەدەری یارمەتی یەکەم\nیاریدەدەری پشتیوانی کلینیکی'},
-      {id:'pr4',icon:'⚡',title_en:'Electrical & Electronics',title_ku:'کارەبا و ئەلیکترۆنیک',desc_en:'Wiring, industrial automation and electronic systems with hands-on workshop training.',desc_ku:'ڕاکێشانی سیم، ئۆتۆماسیۆنی پیشەگەری و سیستمی ئەلیکترۆنی لەگەڵ ڕاهێنانی پراکتیکی.',courses_en:'Electrical wiring\nIndustrial automation\nElectronic systems',courses_ku:'سیمکێشی کارەبا\nئۆتۆماسیۆنی پیشەگەری\nسیستمی ئەلیکترۆنی',careers_en:'Electrical installation assistant\nElectronics technician\nIndustrial automation assistant',careers_ku:'یاریدەدەری دامەزراندنی کارەبا\nتەکنیکی ئەلیکترۆنیک\nیاریدەدەری ئۆتۆماسیۆنی پیشەگەری'}
+      {id:'pr2',icon:'📊',title_en:'Business',title_ku:'بازرگانی',desc_en:'Accounting, marketing, and management skills for modern businesses and entrepreneurship.',desc_ku:'ژمێریاری، بازرگانی و شارەزایی بەرێوەبردن بۆ بازرگانییە نوێکان و خاوەنکارایەتی.',courses_en:'Accounting fundamentals\nMarketing\nBusiness management\nEntrepreneurship',courses_ku:'بنەماکانی ژمێریاری\nبازرگانی\nبەرێوەبردنی بازرگانی\nخاوەنکارایەتی',careers_en:'Bookkeeping assistant\nMarketing assistant\nOffice administrator',careers_ku:'یاریدەدەری تۆمارکردنی ژمێریاری\nیاریدەدەری بازرگانی\nبەرێوەبەری نووسینگە'},
+      {id:'pr3',icon:'🎨',title_en:'Design',title_ku:'دیزاین',desc_en:'Creative and practical design skills for visual communication and digital media.',desc_ku:'شارەزایی داهێنەرانە و پراکتیکی دیزاین بۆ پەیوەندیی بینراو و میدیای دیجیتاڵی.',courses_en:'Graphic design\nVisual communication\nDigital media',courses_ku:'دیزاینی گرافیکی\nپەیوەندیی بینراو\nمیدیای دیجیتاڵی',careers_en:'Graphic design assistant\nVisual content creator\nDigital media assistant',careers_ku:'یاریدەدەری دیزاینی گرافیکی\nدروستکەری ناوەڕۆکی بینراو\nیاریدەدەری میدیای دیجیتاڵی'},
+      {id:'pr4',icon:'🧳',title_en:'Tourism',title_ku:'گەشتیاری',desc_en:'Practical skills for tourism, hospitality, and visitor services.',desc_ku:'شارەزایی پراکتیکی بۆ گەشتیاری، میوانداری و خزمەتگوزاریی سەردانکەران.',courses_en:'Tourism fundamentals\nHospitality\nVisitor services',courses_ku:'بنەماکانی گەشتیاری\nمیوانداری\nخزمەتگوزاریی سەردانکەران',careers_en:'Tourism services assistant\nHospitality assistant\nVisitor information assistant',careers_ku:'یاریدەدەری خزمەتگوزاریی گەشتیاری\nیاریدەدەری میوانداری\nیاریدەدەری زانیاریی سەردانکەران'}
     ],
     posts:[
       {id:'p1',date:'2026-09-20',pinned:true,title_en:'Autumn Semester Registration Now Open',title_ku:'تۆمارکردنی وەرزی پایز کرایەوە',
@@ -217,7 +217,13 @@ const Store={
     this.data.posts=this.data.posts.filter(post=>post.type!=='alumni').map(({storyRole_en,storyRole_ku,...post})=>post);
     this.data.programs=this.data.programs.map(program=>{
       const seed=def.programs.find(item=>item.id===program.id);
-      return seed?{...seed,...program}:program;
+      const merged=seed?{...seed,...program}:program;
+      const legacyTitles={
+        pr2:'Business Administration',
+        pr3:'Health & Nursing',
+        pr4:'Electrical & Electronics'
+      };
+      return legacyTitles[program.id]===program.title_en?{...merged,...seed}:merged;
     });
     const settings=await this.db.collection('settings').doc('main').get();
     if(settings.exists){
