@@ -10,8 +10,8 @@ if(sess){
 
     const setText=(id,value)=>{const element=document.getElementById(id);if(element)element.textContent=value;};
     const assignedStudents=()=>Store.data.students.filter(student=>
-      student.teacherId===sess.id||(student.sharedWith||[]).includes(sess.id));
-    const attendanceStudents=()=>Store.data.students.filter(student=>student.teacherId===sess.id);
+      studentHasTeacher(student,sess.id)||(student.sharedWith||[]).includes(sess.id));
+    const attendanceStudents=()=>Store.data.students.filter(student=>studentHasTeacher(student,sess.id));
     const stageLabel=stage=>`${t('stage')} ${stage}`;
 
     function renderAttendanceRoster(){
@@ -63,7 +63,7 @@ if(sess){
 
       document.getElementById('teacher-students-list').innerHTML=students.map(student=>{
         const department=(DEPTS[student.dept]&&DEPTS[student.dept][Vis.lang])||student.dept||'—';
-        const shared=student.teacherId!==sess.id;
+        const shared=!studentHasTeacher(student,sess.id);
         return `<tr><td>${esc(pick({en:student.name_en,ku:student.name_ku})||student.name_en||student.name_ku||'')}</td>
           <td>${esc(student.username||'')}</td><td>${esc(department)}</td><td>${esc(String(student.stage||'—'))}</td><td>${esc(student.className||'—')}</td>
           <td><span class="tag">${t(shared?'teacher_shared_readonly':'teacher_assigned')}</span></td></tr>`;
@@ -135,7 +135,7 @@ if(sess){
         timeOut:row.querySelector('.attendance-time-out').value,
         signature:row.querySelector('.attendance-signature').value.trim()
       }));
-      if(records.some(record=>!record.student||record.student.teacherId!==sess.id)){
+      if(records.some(record=>!record.student||!studentHasTeacher(record.student,sess.id))){
         toast(t('attendance_save_error'),false);return;
       }
       submitButton.disabled=true;

@@ -24,8 +24,8 @@ if(Object.prototype.hasOwnProperty.call(tabTitle,requestedTab)
   &&(requestedTab!=='staff'||isOwner(sess)))tab=requestedTab;
 const val=id=>document.getElementById(id).value.trim();
 const deptLabel=k=>(DEPTS[k]&&DEPTS[k][Vis.lang])||k;
-const studentList=()=>sess.role==='teacher'?Store.data.students.filter(s=>s.teacherId===sess.id||(s.sharedWith||[]).includes(sess.id)):Store.data.students;
-const canManageStudent=s=>sess.role!=='teacher'||s.teacherId===sess.id;
+const studentList=()=>sess.role==='teacher'?Store.data.students.filter(s=>studentHasTeacher(s,sess.id)||(s.sharedWith||[]).includes(sess.id)):Store.data.students;
+const canManageStudent=s=>sess.role!=='teacher'||studentHasTeacher(s,sess.id);
 const canManagePublicContent=()=>['owner','admin','content_editor'].includes(sess.role);
 const canManageResources=()=>canManagePublicContent()||sess.role==='teacher';
 function initials(name){return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
@@ -323,6 +323,10 @@ function vStudents(){
   const visible=studentList();
   const list=visible.filter(s=>!q||((s.name_en||'')+' '+(s.name_ku||'')+' '+(s.username||'')+' '+(s.className||'')).toLowerCase().includes(q));
   const stu=stuEditId?visible.find(x=>x.id===stuEditId):null;
+  const teachers=Store.data.admins.filter(account=>account.role==='teacher');
+  const assignedTeacherIds=stu
+    ?[...new Set([...(Array.isArray(stu.teacherIds)?stu.teacherIds:[]),stu.teacherId].filter(Boolean))]
+    :sess.role==='teacher'?[sess.id]:[teachers[0]?.id].filter(Boolean);
   let form='';
   if(showStuForm){
     form=`<div class="panel"><h3>${stu?t('edit'):t('add_student')}</h3>
@@ -334,7 +338,7 @@ function vStudents(){
       <div class="field"><label>${t('dept')}</label><select id="f-dept" class="input">${Object.keys(DEPTS).map(k=>`<option value="${k}" ${stu&&stu.dept===k?'selected':''}>${esc(DEPTS[k][Vis.lang])}</option>`).join('')}</select></div>
       <div class="field"><label>${t('stage')}</label><select id="f-stage" class="input">${stu&&Number(stu.stage)>5?`<option value="${esc(String(stu.stage))}" selected disabled>${t('existing_stage')}: ${esc(String(stu.stage))}</option>`:''}${Array.from({length:5},(_,i)=>i+1).map(n=>`<option value="${n}" ${stu&&Number(stu.stage)===n?'selected':''}>${t('stage')} ${n}</option>`).join('')}</select></div>
       <div class="field"><label>${t('class_name')}</label><input id="f-class" class="input" maxlength="120" value="${esc(stu?.className||'')}"></div>
-      ${sess.role==='teacher'?'':`<div class="field"><label>${t('assigned_teacher')}</label><select id="f-teacher" class="input">${Store.data.admins.filter(a=>['teacher','admin','owner'].includes(a.role)).map(a=>`<option value="${esc(a.id)}" ${(stu?.teacherId||sess.id)===a.id?'selected':''}>${esc(a.username||a.name)}</option>`).join('')}</select></div>`}
+      ${sess.role==='teacher'?'':`<div class="field" style="grid-column:1/-1"><label>${t('assigned_teachers')}</label><div class="form-grid">${teachers.map(teacher=>`<label class="check"><input type="checkbox" name="f-teachers" value="${esc(teacher.id)}" ${assignedTeacherIds.includes(teacher.id)?'checked':''}> <span>${esc(teacher.username||teacher.name)}</span></label>`).join('')}</div></div>`}
       <div class="field"><label>${t('phone_l')}${stu?'':' *'}</label><input id="f-phone" type="tel" class="input" value="${esc(stu?.phone||'')}" ${stu?'':'pattern="\\+[1-9][0-9]{7,14}" required'}></div>
       <div class="field"><label>${t('dob')}</label><input id="f-dob" type="date" class="input" value="${esc(stu?.dob||'')}"></div>
       <div class="field"><label>${t('email')}</label><input id="f-email" class="input" value="${esc(stu?.email||'')}"></div>
@@ -419,11 +423,15 @@ async function saveStudent(){
   })).filter(g=>g.subject);
   const stage=Number(val('f-stage'));
   if((stage<1||stage>5)&&!(stu&&stage===Number(stu.stage))){toast(t('err_fill'),false);return;}
+  const teacherIds=sess.role==='teacher'
+    ?[...new Set([...(Array.isArray(stu?.teacherIds)?stu.teacherIds:[]),stu?.teacherId||sess.id])]
+    :[...document.querySelectorAll('input[name="f-teachers"]:checked')].map(input=>input.value);
+  if(sess.role!=='teacher'&&!teacherIds.length){toast(t('err_fill'),false);return;}
   const phone=val('f-phone').replace(/[ ()-]/g,'');
   const data={name_en,name_ku,dept:val('f-dept'),stage,className:val('f-class'),phone,email:val('f-email'),
     dob:val('f-dob'),grades,
     emailOptIn:document.getElementById('f-email-opt-in')?.checked===true,
-    ...(sess.role==='teacher'?{}:{teacherId:val('f-teacher')||sess.id})};
+    ...(sess.role==='teacher'?{}:{teacherId:teacherIds[0],teacherIds})};
   if(stu){
     delete stu.smsOptIn;
     delete stu.whatsappOptIn;
@@ -439,7 +447,7 @@ async function saveStudent(){
   }else{
     const account=await Auth.createAuthAccount(synEmail(user),pass,'student');
     if(!account.ok){toast(account.error||t('username_taken'),false);return;}
-    const ns={id:account.uid,username:user,teacherId:sess.id,sharedWith:[],attendance:100,attMap:{},...data};
+    const ns={id:account.uid,username:user,teacherId:sess.id,teacherIds:[sess.id],sharedWith:[],attendance:100,attMap:{},...data};
     await Store.setDoc('students',ns);
   }
   showStuForm=false;stuEditId=null;toast(t('saved_ok'));render();
@@ -461,7 +469,7 @@ function accessRequestsPanel(){
 async function requestStudentAccess(){
   const username=document.getElementById('share-username').value.trim().toLowerCase();
   const student=Store.data.students.find(s=>s.username.toLowerCase()===username);
-  if(!student||!student.teacherId||student.teacherId===sess.id){toast(t('student_not_found'),false);return;}
+  if(!student||!student.teacherId||studentHasTeacher(student,sess.id)){toast(t('student_not_found'),false);return;}
   if(Store.data.accessRequests.some(r=>r.studentId===student.id&&r.requesterId===sess.id&&r.status==='pending')){toast(t('request_pending'),false);return;}
   const requester=Store.data.admins.find(a=>a.id===sess.id);
   await Store.setDoc('accessRequests',{id:uid('share'),studentId:student.id,studentName:student.name_en,ownerId:student.teacherId,

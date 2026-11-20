@@ -295,8 +295,9 @@ const Store={
       this.data.examResults=examResults.docs.map(d=>({id:d.id,...d.data()})).filter(result=>result.filePath||result.fileData);
       return;
     }
-    const [owned,shared,incoming,outgoing,assignments,submissions,materials,schedule,resources]=await Promise.all([
+    const [owned,assigned,shared,incoming,outgoing,assignments,submissions,materials,schedule,resources]=await Promise.all([
       this.db.collection('students').where('teacherId','==',user.id).get(),
+      this.db.collection('students').where('teacherIds','array-contains',user.id).get(),
       this.db.collection('students').where('sharedWith','array-contains',user.id).get(),
       this.db.collection('accessRequests').where('ownerId','==',user.id).get(),
       this.db.collection('accessRequests').where('requesterId','==',user.id).get(),
@@ -305,7 +306,7 @@ const Store={
       this.db.collection('materials').get(),this.db.collection('schedule').get(),this.db.collection('resources').get()
     ]);
     const students=new Map();
-    [...owned.docs,...shared.docs].forEach(d=>students.set(d.id,{id:d.id,...d.data()}));
+    [...owned.docs,...assigned.docs,...shared.docs].forEach(d=>students.set(d.id,{id:d.id,...d.data()}));
     this.data.students=[...students.values()].map(({feeTotal,branchId,...student})=>student);
     const requests=new Map();
     [...incoming.docs,...outgoing.docs].forEach(d=>requests.set(d.id,{id:d.id,...d.data()}));

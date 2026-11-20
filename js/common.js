@@ -1,5 +1,9 @@
 
 /* ===== translations ===== */
+function studentHasTeacher(student,teacherId){
+  return student?.teacherId===teacherId||Array.isArray(student?.teacherIds)&&student.teacherIds.includes(teacherId);
+}
+
 const I18N={
 en:{
  home:'Home',about:'About',programs:'Programs',news:'News & Announcements',contact:'Contact',login:'Login',logout:'Logout',
@@ -112,7 +116,7 @@ en:{
  event_kind:'Type',class_session:'Class',exam:'Exam',course:'Course / Subject',room:'Room',start_time:'Start time',end_time:'End time',due_date:'Due date',instructions:'Instructions',
  submit_work:'Submit work',submission:'Submission',answer:'Your answer',attachment:'Attach a file',submitted:'Submitted',submitted_ok:'Work submitted.',overdue:'Closed',no_assignments:'No assignments yet.',no_schedule:'No upcoming classes or exams.',no_materials:'No course materials yet.',resource:'Resource link',learning_saved:'Learning item saved.',file_too_large:'Files must be 2 MB or smaller.',file_read_error:'The file could not be read.',
  access_requests:'Student access requests',request_access:'Request access',student_username:'Student username',
- shared_read_only:'Shared · read only',approve:'Approve',request_pending:'Request is already pending.',student_not_found:'No student found with that username, or access cannot be requested.',assigned_teacher:'Assigned teacher',
+ shared_read_only:'Shared · read only',approve:'Approve',request_pending:'Request is already pending.',student_not_found:'No student found with that username, or access cannot be requested.',assigned_teacher:'Assigned teacher',assigned_teachers:'Assigned teachers',
  share_approved:'Access approved.',share_denied:'Request declined.',request_sent:'Request sent to the student’s teacher.',
  total_students:'Total Students',published_posts:'Published Posts',programs_offered:'Programs Offered',recent_students:'Recently Added Students',
  add_student:'Add Student',search_ph:'Search students…',name_en:'Full Name (English)',name_ku:'Full Name (Kurdish)',
@@ -291,7 +295,7 @@ ku:{
  event_kind:'جۆر',class_session:'وانە',exam:'تاقیکردنەوە',course:'وانە / بابەت',room:'ژوور',start_time:'کاتی دەستپێک',end_time:'کاتی کۆتایی',due_date:'کاتی کۆتایی',instructions:'ڕێنماییەکان',
  submit_work:'ناردنی ئەرک',submission:'ناردراو',answer:'وەڵامەکەت',attachment:'هاوپێچکردنی فایل',submitted:'نێردراوە',submitted_ok:'ئەرکەکە نێردرا.',overdue:'داخراوە',no_assignments:'هێشتا ئەرک نییە.',no_schedule:'وانە یان تاقیکردنەوەی داهاتوو نییە.',no_materials:'هێشتا سەرچاوەی وانە نییە.',resource:'لینکی سەرچاوە',learning_saved:'بە سەرکەوتوویی پاشەکەوت کرا.',file_too_large:'قەبارەی فایل نابێت لە ٢ مێگابایت زیاتر بێت.',file_read_error:'فایلەکە نەخوێندرایەوە.',
  access_requests:'داواکارییەکانی دەستگەیشتن بە قوتابی',request_access:'داوای دەستگەیشتن بکە',student_username:'ناوی قوتابی',
- shared_read_only:'هاوبەشکراو · تەنها خوێندنەوە',approve:'پەسەندکردن',request_pending:'داواکارییەکە چاوەڕوانە.',student_not_found:'بەم ناوی بەکارهێنەرە قوتابی نەدۆزرایەوە یان داوای دەستگەیشتن ناکرێت.',assigned_teacher:'مامۆستای دیاریکراو',
+ shared_read_only:'هاوبەشکراو · تەنها خوێندنەوە',approve:'پەسەندکردن',request_pending:'داواکارییەکە چاوەڕوانە.',student_not_found:'بەم ناوی بەکارهێنەرە قوتابی نەدۆزرایەوە یان داوای دەستگەیشتن ناکرێت.',assigned_teacher:'مامۆستای دیاریکراو',assigned_teachers:'مامۆستایانی دیاریکراو',
  share_approved:'دەستگەیشتن پەسەند کرا.',share_denied:'داواکاری ڕەتکرایەوە.',request_sent:'داواکارییەکە بۆ مامۆستای قوتابی نێردرا.',
  total_students:'کۆی قوتابیان',published_posts:'پۆستی بڵاوکراو',programs_offered:'بەرنامە بەردەستەکان',recent_students:'دوایین قوتابی زیادکراوەکان',
  add_student:'زیادکردنی قوتابی',search_ph:'گەڕان بەدوای قوتابی…',name_en:'ناوی تەواو (ئینگلیزی)',name_ku:'ناوی تەواو (کوردی)',

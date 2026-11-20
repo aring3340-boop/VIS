@@ -39,6 +39,7 @@ Open `http://localhost:8000`. Serving the folder lets the app cache its pages an
 
 - Records, settings, and uploaded files are stored in Supabase.
 - Staff accounts and student accounts use Supabase Auth.
+- Managers can assign a student to multiple teacher accounts. Apply the latest Supabase migration with `supabase db push` (or the deployment workflow's **apply_migrations** option) before using this feature.
 - Use **Backup / restore** to export or restore an authorized backup. Keep backups private because they contain student and institute data.
 - PDF uploads use the limits configured by the Supabase Storage buckets and Edge Functions.
 - Certificate and transcript documents use the browser's print dialog; choose its save-as-PDF option if you need a PDF file.
