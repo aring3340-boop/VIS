@@ -636,6 +636,7 @@ body:not(.public-site) .dash-hero{
 }
 body:not(.public-site) .dash-grid{gap:18px;padding-top:30px}
 body:not(.public-site) .dash-grid>.card{
+  min-width:0;
   border-top:3px solid rgba(182,146,91,.68);
   transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
 }
