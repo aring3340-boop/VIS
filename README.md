@@ -39,6 +39,7 @@ Open `http://localhost:8000`. Serving the folder lets the app cache its pages an
 
 - Records, settings, and uploaded files are stored in Supabase.
 - Staff accounts and student accounts use Supabase Auth.
+- On or after June 25 each year, admins can review grades, select students who passed, and approve those promotions together. Students without recorded grades require an admin decision, and promotion stops at stage 5.
 - Managers can assign a student to multiple teacher accounts. Apply the latest Supabase migration with `supabase db push` (or the deployment workflow's **apply_migrations** option) before using this feature.
 - Use **Backup / restore** to export or restore an authorized backup. Keep backups private because they contain student and institute data.
 - PDF uploads use the limits configured by the Supabase Storage buckets and Edge Functions.

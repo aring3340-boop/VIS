@@ -14,6 +14,8 @@ let showNotifForm=false;
 let showScheduleForm=false,scheduleEditId=null;
 let learningMode='assignments',showAssignmentForm=false,assignmentEditId=null,showMaterialForm=false,materialEditId=null;
 let instructorEditId=null,resourceEditId=null,staffEditId=null;
+const promotionSelections=new Set();
+let promotionSelectionYear=null;
 
 const tabTitle={dash:'dash',students:'students',attendance:'attendance_admin',schedule:'schedule','exam-results':'exam_results',backup:'backup_restore',learning:'learning',
   resources:'resources_admin',msgs:'msgs',certs:'certs',website:'website_editor',staff:'staff_accounts',account:'account'};
@@ -268,7 +270,7 @@ function vDash(){
   const d=Store.data;
   const visible=studentList();
   const recent=[...visible].slice(-5).reverse();
-  return `<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+  return vStagePromotions()+`<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
     <div class="stat"><b>${visible.length}</b><span>${t('total_students')}</span></div>
     <div class="stat"><b>${d.posts.length}</b><span>${t('published_posts')}</span></div>
     <div class="stat"><b>${d.programs.length}</b><span>${t('programs_offered')}</span></div>
@@ -447,10 +449,58 @@ async function saveStudent(){
   }else{
     const account=await Auth.createAuthAccount(synEmail(user),pass,'student');
     if(!account.ok){toast(account.error||t('username_taken'),false);return;}
-    const ns={id:account.uid,username:user,teacherId:sess.id,teacherIds:[sess.id],sharedWith:[],attendance:100,attMap:{},...data};
+    const now=new Date(),year=now.getFullYear();
+    const progressionYear=stageProgressionYear(now)||year-1;
+    const ns={id:account.uid,username:user,teacherId:sess.id,teacherIds:[sess.id],sharedWith:[],attendance:100,attMap:{},
+      lastStagePromotionYear:progressionYear,...data};
     await Store.setDoc('students',ns);
   }
   showStuForm=false;stuEditId=null;toast(t('saved_ok'));render();
+}
+function stageProgressionYear(date=new Date()){
+  return date.getMonth()>5||(date.getMonth()===5&&date.getDate()>=25)?date.getFullYear():null;
+}
+function pendingStagePromotions(year=stageProgressionYear()){
+  if(year===null||!['owner','admin'].includes(sess.role))return [];
+  if(promotionSelectionYear!==year){promotionSelections.clear();promotionSelectionYear=year;}
+  return Store.data.students.filter(student=>{
+    const stage=Number(student.stage);
+    return Number.isInteger(stage)&&stage>=1&&stage<5&&Number(student.lastStagePromotionYear||0)<year;
+  });
+}
+function vStagePromotions(){
+  const year=stageProgressionYear(),students=pendingStagePromotions(year);
+  if(!students.length)return '';
+  const selectedCount=students.filter(student=>promotionSelections.has(student.id)).length;
+  return `<div class="panel"><div class="search-row"><h3 style="margin:0">${t('stage_promotions')}</h3><span class="tag">${year}</span></div>
+    <p class="muted">${t('stage_promotion_hint')}</p>
+    <div class="table-wrap"><table><thead><tr><th>${t('promote_student')}</th><th>${t('student_name')}</th><th>${t('stage')}</th><th>${t('grades')}</th></tr></thead><tbody>
+      ${students.map(student=>`<tr><td><label class="check"><input type="checkbox" data-promote-student="${esc(student.id)}" ${promotionSelections.has(student.id)?'checked':''}></label></td>
+        <td>${esc(student.name_en||student.name_ku||student.username||'')}</td><td>${esc(String(student.stage))}</td>
+        <td>${(student.grades||[]).map(grade=>`${esc(grade.subject)}: ${esc(String(grade.score??0))}%`).join('<br>')||`<span class="muted">${t('stage_promotion_no_grades')}</span>`}</td></tr>`).join('')}
+    </tbody></table></div>
+    <button class="btn btn-gold" id="approve-stage-promotions" ${selectedCount?'':'disabled'}>${t('approve_selected_promotions')} (${selectedCount})</button>
+  </div>`;
+}
+async function approveStagePromotions(button){
+  if(button.disabled)return;
+  const year=stageProgressionYear(),students=pendingStagePromotions(year)
+    .filter(student=>promotionSelections.has(student.id));
+  if(year===null||!students.length)return;
+  button.disabled=true;button.textContent=t('saving');
+  const results=await Promise.all(students.map(async student=>{
+    try{
+      await Store.setDoc('students',{...student,stage:Number(student.stage)+1,lastStagePromotionYear:year});
+      return {student};
+    }catch(error){return {student,error};}
+  }));
+  const failures=results.filter(result=>result.error);
+  results.filter(result=>!result.error).forEach(result=>promotionSelections.delete(result.student.id));
+  if(failures.length){
+    failures.forEach(result=>console.error(`Could not advance student ${result.student.id}:`,result.error));
+    toast(t('admin_save_error'),false);
+  }else toast(t('stage_promotions_approved'));
+  render();
 }
 function accessRequestsPanel(){
   if(sess.role==='teacher'){
@@ -894,6 +944,7 @@ function exportMsgs(){
 document.getElementById('tab-content').addEventListener('click',async e=>{
   if(await VisExtended.handleAdminClick(e,render))return;
   const q=s=>e.target.closest(s);let b;
+  if(b=q('#approve-stage-promotions')){await approveStagePromotions(b);return;}
   if(b=q('#sc-add')){showScheduleForm=true;scheduleEditId=null;render();return;}
   if(b=q('[data-instedit]')){instructorEditId=b.dataset.instedit;render();return;}
   if(b=q('[data-instdel]')){if(confirm(t('confirm_del'))){await Store.del('instructors',b.dataset.instdel);toast(t('deleted_ok'));render();}return;}
@@ -1051,6 +1102,17 @@ document.getElementById('tab-content').addEventListener('click',async e=>{
   if(b=q('#acct-save')){await changePw();return;}
 });
 document.getElementById('tab-content').addEventListener('change',VisExtended.handleAdminChange);
+document.getElementById('tab-content').addEventListener('change',e=>{
+  const checkbox=e.target.closest('[data-promote-student]');
+  if(!checkbox)return;
+  if(checkbox.checked)promotionSelections.add(checkbox.dataset.promoteStudent);
+  else promotionSelections.delete(checkbox.dataset.promoteStudent);
+  const button=document.getElementById('approve-stage-promotions');
+  if(!button)return;
+  const count=document.querySelectorAll('#tab-content [data-promote-student]:checked').length;
+  button.disabled=count===0;
+  button.textContent=`${t('approve_selected_promotions')} (${count})`;
+});
 boot(()=>{
   render();
 });
